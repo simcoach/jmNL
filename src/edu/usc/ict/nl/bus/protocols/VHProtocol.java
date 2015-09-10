@@ -124,7 +124,7 @@ public class VHProtocol extends Protocol {
 				} catch (Exception ex){
 					//System.out.println("MessageListener.messageAction received non vrExpress message.");
 				}
-				if (!inTwoVHCharactersMode || vhMyself==null || vhMyself.equals(msg.getSpeaker())) {
+				if (!inTwoVHCharactersMode || vhMyself==null || (msg != null && vhMyself.equals(msg.getSpeaker()))) {
 					if (msg!=null) {
 						if (msg.isComplete()) {
 							for(Long sessionID : bus.getSessions()) {

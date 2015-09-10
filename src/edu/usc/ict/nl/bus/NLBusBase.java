@@ -177,7 +177,9 @@ public abstract class NLBusBase implements NLBusInterface {
 				oldestAction = reply;
 			}
 		}
-		timestampsById.put(oldestAction.hashCode(),currentTime);
+		if (oldestAction != null) {
+			timestampsById.put(oldestAction.hashCode(),currentTime);
+		}
 		return oldestAction;
 	}
 

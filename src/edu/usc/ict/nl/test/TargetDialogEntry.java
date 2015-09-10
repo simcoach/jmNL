@@ -156,11 +156,11 @@ public class TargetDialogEntry {
 					end=Integer.parseInt(m.group(3));
 				} catch (Exception e) {}
 				if (start!=null && end!=null) isChartNlu=true;
-				if (isChartNlu && chartNlu==null) {
-					chartNlu=new ChartNLUOutput(tde.getText(), new ArrayList<PartialClassification>());
-					sas.add(chartNlu);
-				}
 				if (isChartNlu) {
+					if (chartNlu==null) {
+						chartNlu=new ChartNLUOutput(tde.getText(), new ArrayList<PartialClassification>());
+						sas.add(chartNlu);
+					}
 					List<Token> tokens = BuildTrainingData.tokenize(tde.getText());
 					List<Token> subTokens = tokens.subList(start, end);
 					String subText=BuildTrainingData.untokenize(subTokens);
@@ -319,6 +319,9 @@ public class TargetDialogEntry {
 						if (m.matches() && m.groupCount()==5) {
 							int start=Integer.parseInt(m.group(3)),end=Integer.parseInt(m.group(4));
 							id=m.group(5);
+							if (ret == null) {
+								ret = new ChartNLUOutput(text, null);
+							}
 							((ChartNLUOutput)ret).addPortion(start, end, new NLUOutput(text, id, prob, null));
 						} else {
 							Map<String, Object> payload = nlu.getPayload(id, text);

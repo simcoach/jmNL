@@ -157,6 +157,7 @@ public class FSTNLUOutput extends NLUOutput {
 			Map<String,Integer> numOccurrences = new HashMap<String,Integer>();
 			Map<String,Integer> maxNumOccurrences = new HashMap<String,Integer>();
 			int numTotalCombinations=1;
+			if (keys==null) keys=new HashMap<String, Set<String>>();
 			for (String key:keys.keySet()) {
 				keysAsList.add(key);
 				numTotalCombinations*=keys.get(key).size();

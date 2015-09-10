@@ -297,15 +297,17 @@ public abstract class DM implements DMInterface {
 		}
 
 		if (previousInfoStateContent!=null) {
-			for (String name:content.keySet()) {
-				if (previousInfoStateContent.containsKey(name)) {
-					String oldValue=previousInfoStateContent.get(name);
-					Object newValueO=content.get(name).getAssignedExpression();
-					String newValue=(newValueO!=null)?newValueO.toString():"null";
-					if (oldValue.equals(newValue)) continue;
+			if (content != null) {
+				for (String name:content.keySet()) {
+					if (previousInfoStateContent.containsKey(name)) {
+						String oldValue=previousInfoStateContent.get(name);
+						Object newValueO=content.get(name).getAssignedExpression();
+						String newValue=(newValueO!=null)?newValueO.toString():"null";
+						if (oldValue.equals(newValue)) continue;
+					}
+					if (ret==null) ret=new ArrayList<DialogueOperatorEffect>();
+					ret.add(content.get(name));
 				}
-				if (ret==null) ret=new ArrayList<DialogueOperatorEffect>();
-				ret.add(content.get(name));
 			}
 			previousInfoStateContent.clear();
 		}

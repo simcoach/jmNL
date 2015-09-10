@@ -45,7 +45,7 @@ public class CFisCurrentTopic implements CustomFunctionInterface {
 						}
 					}
 				}
-			} else if (topic.equals("null")) {
+			} else if (topic != null && topic.equals("null")) {
 				return true;
 			}
 		}

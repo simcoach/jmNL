@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -325,7 +324,7 @@ public class RewardPolicy {
 		DM dm = nlModule.getPolicyDMForSession(sid);
 		DialogueKBInterface is=null;
 		if (dm!=null) is = dm.getInformationState();
-		Set<String> variables=is.getAllVariables();
+		Set<String> variables = (is != null) ? is.getAllVariables() : new HashSet<String>();
 		
 		//open the standard input
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
