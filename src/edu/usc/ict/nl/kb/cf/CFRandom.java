@@ -1,5 +1,6 @@
 package edu.usc.ict.nl.kb.cf;
 
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Random;
 
@@ -15,7 +16,11 @@ import edu.usc.ict.nl.utils.FloatAndLongUtils;
 public class CFRandom implements CustomFunctionInterface {
 
 	private static final String name="random".toLowerCase();
-	private static Random seed=new Random(System.currentTimeMillis());
+	private static Random seed = new SecureRandom();
+	
+	static {
+		seed.setSeed(System.currentTimeMillis());
+	}
 
 	@Override
 	public String getName() {return name;}

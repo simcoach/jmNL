@@ -76,6 +76,7 @@ public class AlignmentSummary {
 				if (concept!=currentConcept) {
 					if (currentConcept>=0) {
 						//put an interruption in current concept
+						if (ret==null) ret=new HashMap<String, String>();
 						String phrase=ret.get(concepts[currentConcept]);
 						if (conceptInterrupted==null) conceptInterrupted=new HashMap<String, Boolean>();
 						Boolean wasInterrupted=conceptInterrupted.get(concepts[currentConcept]);

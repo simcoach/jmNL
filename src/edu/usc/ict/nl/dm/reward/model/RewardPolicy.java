@@ -296,16 +296,17 @@ public class RewardPolicy {
 	private HashMap<String, String> readUserMacros(String macroFile) throws IOException {
 		HashMap<String,String> ret=null;
 		if (macroFile!=null) {
-			BufferedReader in=new BufferedReader(new FileReader(new File(getPolicyDirectory(),macroFile)));
-			String line;
-			while((line=in.readLine())!=null) {
-				Matcher m=macroLinePattern.matcher(line);
-				if (m.matches() && (m.groupCount()==2)) {
-					String name=m.group(1);
-					String macro=m.group(2);
-					if (!StringUtils.isEmptyString(name) && !StringUtils.isEmptyString(macro)) {
-						if (ret==null) ret=new HashMap<String, String>();
-						ret.put(name, macro);
+			try (BufferedReader in=new BufferedReader(new FileReader(new File(getPolicyDirectory(),macroFile)))) {
+				String line;
+				while((line=in.readLine())!=null) {
+					Matcher m=macroLinePattern.matcher(line);
+					if (m.matches() && (m.groupCount()==2)) {
+						String name=m.group(1);
+						String macro=m.group(2);
+						if (!StringUtils.isEmptyString(name) && !StringUtils.isEmptyString(macro)) {
+							if (ret==null) ret=new HashMap<String, String>();
+							ret.put(name, macro);
+						}
 					}
 				}
 			}
@@ -715,18 +716,19 @@ public class RewardPolicy {
 	private void importTxtFormat(String fileName,HashMap<String,String> macros, Node sourceNode, Queue<Node> q) throws Exception {
 		try {
 			File f=new File(getPolicyDirectory(),fileName);
-			
-			TextFormatGrammar parser = new TextFormatGrammar(new FileInputStream(f));
-			if (macros!=null) parser.setUserMacros(macros);
-			String result;
-			//System.out.println(f);
-			result = parser.Input();
-			if (logger.getLevel()==Level.DEBUG) FileUtils.dumpToFile(result, f.getName()+"-dump-to-xml.xml");
-			Document doc = XMLUtils.parseXMLString(result, true, true);
-			//System.out.println(XMLUtils.prettyPrintDom(doc, " ", true, true));
-			Node rootNode = doc.getDocumentElement();
-			NodeList cs = rootNode.getChildNodes();
-			for (int i = 0; i < cs.getLength(); i++) q.add(cs.item(i));
+			try (FileInputStream in = new FileInputStream(f)) {
+				TextFormatGrammar parser = new TextFormatGrammar(in);
+				if (macros!=null) parser.setUserMacros(macros);
+				String result;
+				//System.out.println(f);
+				result = parser.Input();
+				if (logger.getLevel()==Level.DEBUG) FileUtils.dumpToFile(result, f.getName()+"-dump-to-xml.xml");
+				Document doc = XMLUtils.parseXMLString(result, true, true);
+				//System.out.println(XMLUtils.prettyPrintDom(doc, " ", true, true));
+				Node rootNode = doc.getDocumentElement();
+				NodeList cs = rootNode.getChildNodes();
+				for (int i = 0; i < cs.getLength(); i++) q.add(cs.item(i));
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new Exception("Error while parsing file: '"+fileName+"' in node: '"+XMLUtils.domNode2String(sourceNode, true, true)+"':\n\n"+e);
@@ -908,41 +910,41 @@ public class RewardPolicy {
 	}
 
 	private void mightEnableTableToGDLGraph(String filename,boolean compress) throws IOException {
-		FileWriter out=new FileWriter(filename);
-		HashSet<Object> visited=new HashSet<Object>();
-		out.write("graph: {display_edge_labels: no\n");
-		if (mightEnableTable!=null) {
-			for(GraphElement source:mightEnableTable.keySet()) {
-				Set<DialogueOperatorEntranceTransition> dests=mightEnableTable.get(source);
-				if (dests!=null) {
-					for(GraphElement dest:dests) {
-						if (compress && (dest instanceof DialogueOperatorEntranceTransition))
-							dest=((DialogueOperatorEntranceTransition) dest).getOperator();
-						if (compress && (source instanceof DialogueOperatorEntranceTransition))
-							source=((DialogueOperatorEntranceTransition) source).getOperator();
-						if (dest!=source) {
-							String gdl="";
-							if (!visited.contains(source)) {
-								gdl+="node: { title: \""+source.getID()+"\" label: \""+source.toString()+"\"}\n";
-								visited.add(source);
+		try (FileWriter out=new FileWriter(filename)) {
+			HashSet<Object> visited=new HashSet<Object>();
+			out.write("graph: {display_edge_labels: no\n");
+			if (mightEnableTable!=null) {
+				for(GraphElement source:mightEnableTable.keySet()) {
+					Set<DialogueOperatorEntranceTransition> dests=mightEnableTable.get(source);
+					if (dests!=null) {
+						for(GraphElement dest:dests) {
+							if (compress && (dest instanceof DialogueOperatorEntranceTransition))
+								dest=((DialogueOperatorEntranceTransition) dest).getOperator();
+							if (compress && (source instanceof DialogueOperatorEntranceTransition))
+								source=((DialogueOperatorEntranceTransition) source).getOperator();
+							if (dest!=source) {
+								String gdl="";
+								if (!visited.contains(source)) {
+									gdl+="node: { title: \""+source.getID()+"\" label: \""+source.toString()+"\"}\n";
+									visited.add(source);
+								}
+								if (!visited.contains(dest)) {
+									gdl+="node: { title: \""+dest.getID()+"\" label: \""+dest.toString()+"\"}\n";
+									visited.add(dest);
+								}
+								String edgeID=source.getID()+"-"+dest.getID();
+								if (!visited.contains(edgeID)) {
+									gdl+="edge: {source: \""+source.getID()+"\" target: \""+dest.getID()+"\" label: \"\" }\n";
+									visited.add(edgeID);
+								}
+								out.write(gdl);
 							}
-							if (!visited.contains(dest)) {
-								gdl+="node: { title: \""+dest.getID()+"\" label: \""+dest.toString()+"\"}\n";
-								visited.add(dest);
-							}
-							String edgeID=source.getID()+"-"+dest.getID();
-							if (!visited.contains(edgeID)) {
-								gdl+="edge: {source: \""+source.getID()+"\" target: \""+dest.getID()+"\" label: \"\" }\n";
-								visited.add(edgeID);
-							}
-							out.write(gdl);
 						}
 					}
 				}
 			}
+			out.write("}");
 		}
-		out.write("}");
-		out.close();
 	}
 	
 	public Set<DialogueOperatorEntranceTransition> getSetOfEntranceOptionsThatCanBeEnabledByHavingExecutedThisEntranceCondition(DialogueOperatorEntranceTransition ec) {
@@ -1170,8 +1172,7 @@ public class RewardPolicy {
 	}
 	
 	public void toGDLGraph(String fileName) {
-		try {
-			PrintWriter out=new PrintWriter(new FileWriter(fileName));
+		try (PrintWriter out=new PrintWriter(new FileWriter(fileName))) {
 			out.write("graph: {display_edge_labels: yes\n");
 			if (getOperators(OpType.ALL)!=null) {
 				for(DialogueOperator op:getOperators(OpType.ALL)) {
@@ -1179,21 +1180,24 @@ public class RewardPolicy {
 				}
 			}
 			out.write("}\n");
-			out.close();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	public void toGDLGraphs(String baseFileName) {
 		try {
 			if (getOperators(OpType.ALL)!=null) {
 				for(DialogueOperator op:getOperators(OpType.ALL)) {
-					PrintWriter out=new PrintWriter(new FileWriter(op.getName()+"-"+baseFileName));
-					out.write("graph: {display_edge_labels: yes\n");
-					op.toGDL(out);
-					out.write("}\n");
-					out.close();
+					try (PrintWriter out=new PrintWriter(new FileWriter(op.getName()+"-"+baseFileName))) {
+						out.write("graph: {display_edge_labels: yes\n");
+						op.toGDL(out);
+						out.write("}\n");
+					}
 				}
 			}
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/*public void getTopicTrainingData(List<String> possibleTopics) {

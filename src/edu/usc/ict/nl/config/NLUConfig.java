@@ -13,6 +13,8 @@ import edu.usc.ict.nl.nlu.ne.NamedEntityExtractorI;
 import edu.usc.ict.nl.nlu.trainingFileReaders.NLUTrainingFileI;
 import edu.usc.ict.nl.nlu.trainingFileReaders.SimcoachUserXLSXFile;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.FileUtil;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class NLUConfig extends NLConfig {
 	
@@ -126,19 +128,21 @@ public class NLUConfig extends NLConfig {
 	public String getForcedNLUContentRoot() {return this.forcedNluContentRoot;}
 	public String getNLUContentRoot() {
 		String forcedContentRoot=getForcedNLUContentRoot();
-		if (!StringUtils.isEmptyString(forcedContentRoot)) return forcedContentRoot+File.separator;
-		else return (nlBusConfig!=null)?nlBusConfig.getCharacterContentRoot()+File.separator+nluDir+File.separator:"";
+		if (!StringUtils.isEmptyString(forcedContentRoot)) 
+			return FileUtil.path(forcedContentRoot+File.separator);
+		else 
+			return (nlBusConfig!=null)?nlBusConfig.getCharacterContentRoot()+File.separator+nluDir+File.separator:"";
 	}
 	/** NLU model file name */
-	public String getNluModelFile() {return getNLUContentRoot()+nluModelFile;}
+	public String getNluModelFile() { return FileUtil.path(getNLUContentRoot()+nluModelFile);}
 	public void setNluModelFile(String nluModelFile) { this.nluModelFile = removeAbsolutePath(nluModelFile); }
 	/** nlu spell checking */
 	public boolean getDoSpellChecking() {return this.doSpellChecking;}
 	public void setDoSpellchecking(boolean s) {this.doSpellChecking=s;}
 	/** NLU training file */
-	public String getNluTrainingFile() {return getNLUContentRoot()+nluTrainingFile;}
+	public String getNluTrainingFile() {return FileUtil.path(getNLUContentRoot()+nluTrainingFile);}
 	public void setNluTrainingFile(String nluTrainingFile) {this.nluTrainingFile = removeAbsolutePath(nluTrainingFile);}
-	public String getNluHardLinks() {return (!StringUtils.isEmptyString(hardLinksFile))?getNLUContentRoot()+hardLinksFile:null;}
+	public String getNluHardLinks() {return (!StringUtils.isEmptyString(hardLinksFile))?FileUtil.path(getNLUContentRoot()+hardLinksFile):null;}
 	public void setNluHardLinks(String file) {this.hardLinksFile = removeAbsolutePath(file);}
 	public boolean getUseSystemFormsToTrainNLU() {return this.useSystemFormsToTrainNLU;}
 	public void setUseSystemFormsToTrainNLU(boolean useForms) {this.useSystemFormsToTrainNLU=useForms;}

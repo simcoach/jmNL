@@ -2,6 +2,7 @@ package edu.usc.ict.nl.nlg.directablechar;
 
 import java.awt.Color;
 import java.lang.reflect.Field;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -176,7 +177,7 @@ public class DirectableChar extends EchoNLG {
 		}
 		
 		float[] s=ObjectKB.getSizeForShape(shape,sizeMod);
-		Random rg=new Random();
+		Random rg = new SecureRandom();
 		//position
 		if (xyz==null) {
 			xyz=new float[3];

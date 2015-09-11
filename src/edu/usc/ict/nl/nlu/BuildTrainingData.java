@@ -341,7 +341,7 @@ public class BuildTrainingData {
 			String userUtteranceSpeechAct=d.getLabel();
 			Pair<String, Collection<String>> saAndsystemUttsPair = ad.get(userUtterance);
 			String a=(saAndsystemUttsPair!=null)?saAndsystemUttsPair.getFirst():null;
-			if (!StringUtils.isEmptyString(a)) {
+			if (a != null && !StringUtils.isEmptyString(a)) {
 				if (!a.equals(userUtteranceSpeechAct)) {
 					System.out.println("Line '"+userUtterance+"' was '"+a+"' and now it is '"+userUtteranceSpeechAct+"'.");
 				}
@@ -444,7 +444,7 @@ public class BuildTrainingData {
 								break;
 							case 8:
 								String utterance=cell.getStringCellValue();
-								if (getThisRow && (!StringUtils.isEmptyString(speechAct)) && (!StringUtils.isEmptyString(utterance)) && (!speechAct.startsWith("answer.form.choice")) && (!speechAct.startsWith("answer.relative-quantity")) && (!speechAct.startsWith("answer.intensity"))) {
+								if (getThisRow && speechAct != null && (!StringUtils.isEmptyString(speechAct)) && (!StringUtils.isEmptyString(utterance)) && (!speechAct.startsWith("answer.form.choice")) && (!speechAct.startsWith("answer.relative-quantity")) && (!speechAct.startsWith("answer.intensity"))) {
 									//String utterance=prepareUtteranceForClassification(cellValue);
 									ret.add(new TrainingDataFormat(utterance,speechAct));
 								}
@@ -1197,6 +1197,7 @@ public class BuildTrainingData {
 				if (!foundText) {
 					text=text.replaceFirst("^.*=>[\\s]*", "");
 					text=prepareUtteranceForClassification(text);
+					if (sas == null) { sas=new HashSet<String>(); }
 					if ((lastItem!=null) && text.equals(lastItem.getFirst())) {
 						lastItem.getSecond().addAll(sas);
 					} else {

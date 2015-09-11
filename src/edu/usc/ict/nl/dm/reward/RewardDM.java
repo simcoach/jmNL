@@ -1852,6 +1852,9 @@ public class RewardDM extends DM {
 	}
 	@Override
 	public void validatePolicy(NLBusBase nlModule) throws Exception {
+		if (dp == null) {
+			throw new NullPointerException("RewardDM.dp is null!");
+		}
 		dp.validate(getSessionID(),nlModule);
 	}
 	

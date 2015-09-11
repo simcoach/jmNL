@@ -155,11 +155,11 @@ public abstract class NLU implements NLUInterface {
 		btd=getBTD();
 		if (trainingFile.exists()) trainingFile.delete();
 		List<TrainingDataFormat> preparedTrainingData=btd.prepareTrainingDataForClassification(td);
-        BufferedWriter outputStream = new BufferedWriter(new FileWriter(trainingFile));
-		for(TrainingDataFormat row:preparedTrainingData) {
-			outputStream.write(row.toNluformat(this));
-		}
-		outputStream.close();
+        try (BufferedWriter outputStream = new BufferedWriter(new FileWriter(trainingFile))) {
+			for(TrainingDataFormat row:preparedTrainingData) {
+				outputStream.write(row.toNluformat(this));
+			}
+        }
 	}
 	
 	private static final Pattern question=Pattern.compile("(.+\\.)?question(\\..+)?");

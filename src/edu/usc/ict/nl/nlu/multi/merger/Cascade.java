@@ -74,6 +74,7 @@ public class Cascade implements Merger {
 			String c=firstClassifierName;
 			NLUOutput finalResult=null;
 			while(c!=null) {
+				if (inputResults==null) inputResults=new HashMap<String, NLUOutput>();
 				NLUOutput resultForC = inputResults.get(c);
 				if (resultForC!=null) {
 					finalResult=resultForC;

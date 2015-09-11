@@ -41,6 +41,7 @@ import edu.usc.ict.nl.nlu.NLUOutput;
 import edu.usc.ict.nl.util.Network;
 import edu.usc.ict.nl.util.XMLUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public abstract class DM implements DMInterface {
 
@@ -118,7 +119,12 @@ public abstract class DM implements DMInterface {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("[yyyy_MM_dd]-[HH_mm_ss]");
 
-		String baseFileName=Network.getHostname()+"-"+System.getProperty("user.name")+"-"+sdf.format(cal.getTime())+"-sid="+getSessionID()+"-pid="+getPersonalSessionID();
+		String baseFileName = Sanitizer.concat(
+				Network.getHostname(), "-",
+				System.getProperty("user.name"), "-",
+				sdf.format(cal.getTime()),
+				"-sid=", Long.toString(getSessionID()),
+				"-pid=", getPersonalSessionID());
 		return baseFileName;
 	}
 
@@ -172,8 +178,8 @@ public abstract class DM implements DMInterface {
 				line=0;
 				String logFileName=getConfiguration().getChatLog();
 
-				String baseFileName=logFileName+"-"+getIDPortionLogFileName();
-				File f=new File(baseFileName+".xml");
+				String baseFileName=Sanitizer.concat(logFileName, "-", getIDPortionLogFileName());
+				File f=new File(Sanitizer.file(baseFileName+".xml"));
 
 				File p=f.getParentFile();
 				if (p!=null && !p.exists()) p.mkdir();
@@ -313,11 +319,13 @@ public abstract class DM implements DMInterface {
 		}
 
 		// save the new information state
-		for (String name:content.keySet()) {
-			Object newValueO=content.get(name).getAssignedExpression();
-			String newValue=(newValueO!=null)?newValueO.toString():"null";
-			if (previousInfoStateContent==null) previousInfoStateContent=new LinkedHashMap<String, String>();
-			previousInfoStateContent.put(name, newValue);
+		if (content != null) {
+			for (String name:content.keySet()) {
+				Object newValueO=content.get(name).getAssignedExpression();
+				String newValue=(newValueO!=null)?newValueO.toString():"null";
+				if (previousInfoStateContent==null) previousInfoStateContent=new LinkedHashMap<String, String>();
+				previousInfoStateContent.put(name, newValue);
+			}
 		}
 
 		// if no assignments to ret, then there was no previousInfoStateContent, so take all the current content. 

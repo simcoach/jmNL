@@ -1,6 +1,7 @@
 package edu.usc.ict.nl.nlu.directablechar;
 
 import java.lang.reflect.Method;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -86,7 +87,7 @@ public class ObjectKB {
 	}
 	
 	public float[] getPositionForNewObject() {
-		Random rand = new Random();
+		Random rand = new SecureRandom();
 		return new float[]{(rand.nextFloat()-.5f)*10,(rand.nextFloat()-.5f)*10,0};
 	}
 	

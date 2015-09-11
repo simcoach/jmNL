@@ -54,6 +54,9 @@ public class SpellCheckProcess {
 		// beginning of w: remove every non word character
 		// end of w: remove everything except a single occurrence of: ":;?!.," , "'" is preceded by an s. remember the single occurrence. remove it. add it at the end.
 		// middle of w: remove everything except a single occurrence of "'";
+		if (to == null) {
+			throw new Exception("to is not initialized!");
+		}
 		if (from == null) {
 			throw new Exception("from is not initialized!");
 		}
