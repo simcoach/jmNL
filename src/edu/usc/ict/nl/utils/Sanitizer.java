@@ -14,6 +14,10 @@ public final class Sanitizer {
 		return toReturn.toString();
 	}
 	
+	public static String log(String s) {
+		return s;
+	}
+	
 	public static String file(String s) {
 		return s;
 	}

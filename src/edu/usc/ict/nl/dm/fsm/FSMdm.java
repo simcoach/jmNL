@@ -31,6 +31,7 @@ import edu.usc.ict.nl.kb.DialogueKB;
 import edu.usc.ict.nl.kb.InformationStateInterface.ACCESSTYPE;
 import edu.usc.ict.nl.nlu.NLUOutput;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 /**
  * @author morbini
@@ -149,11 +150,11 @@ public class FSMdm extends SCXMLRunner {
 			String speechAct = nluResult.getId();
 			Set<String> replies = mapping.get(speechAct);
 			if (replies != null && !replies.contains(unhandledEvent)) {
-				logger.info(" highest probability, handled user event is: "+speechAct);
+				logger.info(Sanitizer.log(" highest probability, handled user event is: "+speechAct));
 				return nluResult;
 			}
 		}
-		logger.info(" all events are unhandled, send the unhandled event: "+config.getUnhandledEventName());
+		logger.info(Sanitizer.log(" all events are unhandled, send the unhandled event: "+config.getUnhandledEventName()));
 		return new NLUOutput(text,unhandledEvent, 1f, unhandledEvent);
 	}
 	
@@ -172,7 +173,7 @@ public class FSMdm extends SCXMLRunner {
 			if (!trivialSA.contains(replySpeechAct)) context.setValueOfVariable("lastSystemSpeechAct", replySpeechAct,ACCESSTYPE.THIS_OVERWRITETHIS);
 			String value = (replySpeechAct.startsWith("question.") ? "yes" : "no");
 			context.setValueOfVariable("lastSystemSpeechActWasQuestion", value,ACCESSTYPE.THIS_OVERWRITETHIS);
-			logger.info("LAST NOT TRIVIAL SYSTEM SA IS: "+context.get("lastSystemSpeechAct")+" and is last system sa a question? "+context.get("lastSystemSpeechActWasQuestion"));
+			logger.info(Sanitizer.log("LAST NOT TRIVIAL SYSTEM SA IS: "+context.get("lastSystemSpeechAct")+" and is last system sa a question? "+context.get("lastSystemSpeechActWasQuestion")));
 		}
 	}
 }

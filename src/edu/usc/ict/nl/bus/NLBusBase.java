@@ -49,6 +49,7 @@ import edu.usc.ict.nl.nlu.ne.NamedEntityExtractorI;
 import edu.usc.ict.nl.ui.chat.ChatInterface;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 /**
  * 
@@ -507,7 +508,7 @@ public abstract class NLBusBase implements NLBusInterface {
 		return policyDM;
 	}
 	protected DM createDMPolicyForCharacter(String characterName,Long sid) throws Exception {
-		logger.info("Starting DM session ("+sid+") for character: "+characterName);
+		logger.info(Sanitizer.log("Starting DM session ("+sid+") for character: "+characterName));
 		if (StringUtils.isEmptyString(characterName)) throw new Exception("Request for creating DM instance for character with empty name.");
 		Object parsedDialoguePolicy = character2parsedPolicy.get(characterName);
 		DM dm=getDM();
@@ -515,12 +516,12 @@ public abstract class NLBusBase implements NLBusInterface {
 		if (parsedDialoguePolicy == null) {				
 			String unparsedPolicy = character2unparsedPolicy.get(characterName);
 			if (StringUtils.isEmptyString(unparsedPolicy)) throw new Exception("Found character with no POLICY associated: '"+characterName+"'");
-			logger.warn("SLOW initialization of POLICY for session: "+sid+" (parsing of file).");
+			logger.warn(Sanitizer.log("SLOW initialization of POLICY for session: "+sid+" (parsing of file)."));
 			parsedDialoguePolicy=dm.parseDialoguePolicy(unparsedPolicy);
 			character2parsedPolicy.put(characterName, parsedDialoguePolicy);
 			policyDM=getDM().createPolicyDM(parsedDialoguePolicy,sid,this);
 		} else {
-			logger.info("QUICK initialization of POLICY for session: "+sid+".");
+			logger.info(Sanitizer.log("QUICK initialization of POLICY for session: "+sid+"."));
 			policyDM=dm.createPolicyDM(parsedDialoguePolicy,sid,this);
 		}
 		return policyDM;
@@ -536,7 +537,7 @@ public abstract class NLBusBase implements NLBusInterface {
 			String characterName = getCharacterName4Session(sid);
 			NLUConfig config=getNLUConfigurationForCharacter(characterName);
 			nlu=(NLUInterface) createSubcomponent(config,config.getNluClass());
-			logger.info("Starting NEW NLU for session "+sid+" for character "+characterName+" with nlu class: "+config.getNluClass());
+			logger.info(Sanitizer.log("Starting NEW NLU for session "+sid+" for character "+characterName+" with nlu class: "+config.getNluClass()));
 			session2NLU.put(sid, nlu);
 			return nlu;
 		}
@@ -560,7 +561,7 @@ public abstract class NLBusBase implements NLBusInterface {
 		NLG nlg=session2NLG.get(sid);
 		String characterName = getCharacterName4Session(sid);
 		boolean characterOK=nlg==null || nlg.getConfiguration().getDefaultCharacter().equals(characterName);
-		if (!characterOK) logger.error("NLG for session "+sid+" associated to character '"+nlg.getConfiguration().getDefaultCharacter()+"' but that session is for character '"+characterName+"'.");
+		if (!characterOK) logger.error(Sanitizer.log("NLG for session "+sid+" associated to character '"+nlg.getConfiguration().getDefaultCharacter()+"' but that session is for character '"+characterName+"'."));
 		if (nlg!=null && characterOK) return nlg;
 		else if (characterOK || createIfNotThereAlready) {
 			NLBusConfig config=(NLBusConfig) getConfiguration().clone();

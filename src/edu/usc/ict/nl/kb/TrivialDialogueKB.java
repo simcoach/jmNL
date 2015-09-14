@@ -23,6 +23,7 @@ import edu.usc.ict.nl.kb.VariableProperties.PROPERTY;
 import edu.usc.ict.nl.kb.cf.CustomFunctionInterface;
 import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.utils.FloatAndLongUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class TrivialDialogueKB extends DialogueKB {
 	
@@ -771,7 +772,7 @@ public class TrivialDialogueKB extends DialogueKB {
 					if (!rulesSuccessfullyApplied.contains(r)) {
 						DialogueKBFormula c=r.getAntecedent();
 						DialogueOperatorEffect update=r.getConsequent();
-						if((logger!=null) && logger.isTraceEnabled()) logger.debug("###("+this+")> forward inference("+type+"), using: "+c);
+						if((logger!=null) && logger.isTraceEnabled()) logger.debug(Sanitizer.log("###("+this+")> forward inference("+type+"), using: "+c));
 						if (type==ACCESSTYPE.AUTO_OVERWRITEAUTO) {
 							context.setLowestUsed(new DialogueKB[1]);
 						} else {
@@ -783,7 +784,7 @@ public class TrivialDialogueKB extends DialogueKB {
 							else update=r.getElseConsequent();
 							if (update!=null) {
 								rulesSuccessfullyApplied.add(r);
-								if((logger!=null) && logger.isTraceEnabled()) logger.debug("###("+this+")> doing update with: "+update);
+								if((logger!=null) && logger.isTraceEnabled()) logger.debug(Sanitizer.log("###("+this+")> doing update with: "+update));
 								DialogueKBInterface updatedKB=null;
 								DialogueKBInterface[] lowest = context.getLowestUsed();
 								if (lowest!=null && lowest[0]!=null) {
@@ -793,11 +794,11 @@ public class TrivialDialogueKB extends DialogueKB {
 								}
 								if (updatedKB!=null) {
 									if(logger!=null) {
-										if (logger.isTraceEnabled()) logger.debug("#"+getID()+": the update changed the KB.");
+										if (logger.isTraceEnabled()) logger.debug(Sanitizer.log("#"+getID()+": the update changed the KB."));
 										else if (logger.isDebugEnabled()) {
-											logger.debug("###("+this+")> forward inference("+type+"), using: "+c);
-											logger.debug("###("+this+")> done update with("+(result?"THEN":"ELSE")+"): "+update);
-											logger.debug("###("+this+")> and the update changed the KB.");
+											logger.debug(Sanitizer.log("###("+this+")> forward inference("+type+"), using: "+c));
+											logger.debug(Sanitizer.log("###("+this+")> done update with("+(result?"THEN":"ELSE")+"): "+update));
+											logger.debug(Sanitizer.log("###("+this+")> and the update changed the KB."));
 										}
 									}
 									// the rule changed THIS KB, restart traversal

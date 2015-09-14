@@ -75,6 +75,7 @@ import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.Triple;
 import edu.usc.ict.nl.util.graph.Edge;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class RewardDM extends DM {
 	
@@ -151,7 +152,7 @@ public class RewardDM extends DM {
 						historyOfExecutedOperators.update(aa);
 					}
 					context.setExecutedOperatorsHistory(historyOfExecutedOperators);
-					logger.info("Executed: "+getExecutedOperatorsHistory().printChain());
+					logger.info(Sanitizer.log("Executed: "+getExecutedOperatorsHistory().printChain()));
 				} catch (Exception e) {logger.error("Error while updating the history of executed operators: ",e);}
 			}
 		}
@@ -200,7 +201,7 @@ public class RewardDM extends DM {
 		Collection<DialogueOperator> ops = dp.getOperators(OpType.DAEMON);
 		if (ops!=null) {
 			if ((dormantDaemonActions!=null) && dormantDaemonActions.getDormantOperators()!=null && !dormantDaemonActions.getDormantOperators().isEmpty()) {
-				if (logger.isDebugEnabled()) logger.info("dormant daemon actions '"+((dormantDaemonActions!=null)?dormantDaemonActions.getDormantOperators():null)+"'");
+				if (logger.isDebugEnabled()) logger.info(Sanitizer.log("dormant daemon actions '"+((dormantDaemonActions!=null)?dormantDaemonActions.getDormantOperators():null)+"'"));
 			}
 			EvalContext context=getContext();
 			List<DialogueOperatorEntranceTransition> ecs = getOperatorsThatCanBeStartedByThisEvent(context, ev, OpType.DAEMON);
@@ -235,7 +236,7 @@ public class RewardDM extends DM {
 
 					if (ec.isReEntrable()) {
 						if (dormantDaemonActions.isThisDormant(op)) {
-							if (logger.isDebugEnabled()) logger.info("Restarting daemon operator with re-entrance option: "+ec);
+							if (logger.isDebugEnabled()) logger.info(Sanitizer.log("Restarting daemon operator with re-entrance option: "+ec));
 							DialogueAction a=dormantDaemonActions.getDormantActionOf(op);
 							a.setAsReentered(ec);
 							a.execute(ev, getRootInformationState());
@@ -243,7 +244,7 @@ public class RewardDM extends DM {
 							logger.error("Selected reentrance condition for non-dormant daemon operator: "+op.getName());
 						}
 					} else {
-						if (logger.isDebugEnabled()) logger.info("New execution of daemon operator with entrance condition: "+ec);
+						if (logger.isDebugEnabled()) logger.info(Sanitizer.log("New execution of daemon operator with entrance condition: "+ec));
 						DialogueAction a=new DialogueAction(ec, this);
 						a.execute(ev, getRootInformationState());
 					}
@@ -256,7 +257,7 @@ public class RewardDM extends DM {
 	private final Semaphore eventLock=new Semaphore(1);
 	@Override
 	public synchronized List<Event> handleEvent(Event ev) {
-		logger.info("=> received event '"+ev+"' ("+(ev!=null?ev.getClass().getCanonicalName():null)+")");
+		logger.info(Sanitizer.log("=> received event '"+ev+"' ("+(ev!=null?ev.getClass().getCanonicalName():null)+")"));
 		if (!getPauseEventProcessing()) {
 			super.handleEvent(ev);
 			try {
@@ -264,9 +265,9 @@ public class RewardDM extends DM {
 					logger.info("Empty NLU event received, ignoring.");
 				} else {
 					if (ev instanceof NLUEvent && getConfiguration().getUserAlwaysInterrupts()) {
-						logger.info("/ Interrupting current speaking action (speaking="+getSpeakingTracker().isSpeaking()+") as received user event and global interruption policy is enabled.");
+						logger.info(Sanitizer.log("/ Interrupting current speaking action (speaking="+getSpeakingTracker().isSpeaking()+") as received user event and global interruption policy is enabled."));
 						interruptCurrentlySpeakingAction(ev);
-						logger.info("\\ Done interruption. (speaking="+getSpeakingTracker().isSpeaking()+")Continue processsing trigger event '"+ev+"' ("+(ev!=null?ev.getClass().getCanonicalName():null)+")");
+						logger.info(Sanitizer.log("\\ Done interruption. (speaking="+getSpeakingTracker().isSpeaking()+")Continue processsing trigger event '"+ev+"' ("+(ev!=null?ev.getClass().getCanonicalName():null)+")"));
 					}
 					updateInformationStateWithEvent(ev);
 					runForwardInferenceInTheseDormantActionsLocalKBs(getDormantActions(OpType.DAEMON));
@@ -309,7 +310,7 @@ public class RewardDM extends DM {
 			//if (collectedEvents!=null && !collectedEvents.isEmpty()) return new ArrayList<Event>(collectedEvents);
 			//else return null;
 		} else {
-			logger.info("Event received but processing paused: "+ev);
+			logger.info(Sanitizer.log("Event received but processing paused: "+ev));
 		}
 		return null;
 	}
@@ -321,7 +322,7 @@ public class RewardDM extends DM {
 				for(DialogueAction a:dacs) {
 					DialogueKBInterface lkb = a.getLocalVarKB();
 					if (lkb!=null) {
-						logger.info("running forward inference in Dormant action local KB ("+lkb+") of operator: "+a.getOperator());
+						logger.info(Sanitizer.log("running forward inference in Dormant action local KB ("+lkb+") of operator: "+a.getOperator()));
 						lkb.runForwardInference(ACCESSTYPE.AUTO_OVERWRITEAUTO);
 					}
 				}
@@ -333,7 +334,7 @@ public class RewardDM extends DM {
 		try {
 			NLGEvent ev=getSpeakingTracker().getCurrentlySpeackingEvent();
 			if (ev!=null) {
-				logger.info("executing interruption of event: "+ev);
+				logger.info(Sanitizer.log("executing interruption of event: "+ev));
 				getMessageBus().handleDMResponseEvent(new DMInterruptionRequest(sourceEvent, getSessionID(), ev));
 			} else {
 				logger.warn("not executing interruption as the system speacking tracker says that there is nothing to be interrupted.");
@@ -344,13 +345,13 @@ public class RewardDM extends DM {
 	}
 
 	synchronized private void handleDoneEvent(SystemUtteranceDoneEvent ev) throws Exception {
-		logger.info("====>received done event: "+ev);
+		logger.info(Sanitizer.log("====>received done event: "+ev));
 		getSpeakingTracker().finishedSpeakingThis(ev);
 	}
 	synchronized private void handleLengthEvent(SystemUtteranceLengthEvent ev) throws Exception {
 		String event=ev.getName();
 		Float duration=ev.getPayload();
-		logger.info("====>received length event: "+ev+" = "+duration);
+		logger.info(Sanitizer.log("====>received length event: "+ev+" = "+duration));
 		if (duration==null) {
 			try {
 				DMEventsListenerInterface mb = getMessageBus();
@@ -386,7 +387,7 @@ public class RewardDM extends DM {
 	private void handleDefaultEvent(Event ev) throws Exception {
 		NLUOutput sa=(NLUOutput) ev.getPayload();
 		DialogueAction currentAction=null;
-		logger.info("=================> "+(eventCounter++)+" received event '"+ev+"' with payload: "+((sa!=null)?sa.getPayload():null));
+		logger.info(Sanitizer.log("=================> "+(eventCounter++)+" received event '"+ev+"' with payload: "+((sa!=null)?sa.getPayload():null)));
 
 		cleanupDormantActions();
 		updateActiveAndDormantVariables();
@@ -403,13 +404,13 @@ public class RewardDM extends DM {
 			updateActiveAndDormantVariables();
 			currentAction=getCurrentActiveAction();
 
-			logger.info(" current action '"+currentAction+"'");
-			logger.info(" dormant actions '"+((dormantActions!=null)?dormantActions.getDormantOperators():null)+"'");
+			logger.info(Sanitizer.log(" current action '"+currentAction+"'"));
+			logger.info(Sanitizer.log(" dormant actions '"+((dormantActions!=null)?dormantActions.getDormantOperators():null)+"'"));
 			runForwardInferenceInTheseDormantActionsLocalKBs(getDormantActions(OpType.DAEMON));
 			runForwardInferenceInTheseDormantActionsLocalKBs(getDormantActions(OpType.NORMAL));
 			
 			if (currentAction!=null && currentAction.isPaused() && !ev.isUserEvent() && getSpeakingTracker().isSpeaking()) {
-				logger.info("Input event is not a user event, current action is paused and speaking => delay running search for new action.");
+				logger.info(Sanitizer.log("Input event is not a user event, current action is paused and speaking => delay running search for new action."));
 				break;
 			} else {
 				// select action and pick exact event handled (the nlu event can contain multiple simple events, select one among them).
@@ -426,14 +427,14 @@ public class RewardDM extends DM {
 				currentAction=getCurrentActiveAction();
 				if (currentAction!=null) {
 					assert(!dormantActions.isThisDormant(currentAction.getOperator()));
-					if (handledEvent!=null) logger.info("  action '"+currentAction+"' will consume the event '"+handledEvent+"'");
-					else logger.info("  no events, continuing action: "+currentAction.getOperator());
+					if (handledEvent!=null) logger.info(Sanitizer.log("  action '"+currentAction+"' will consume the event '"+handledEvent+"'"));
+					else logger.info(Sanitizer.log("  no events, continuing action: "+currentAction.getOperator()));
 					currentAction.execute(handledEvent, getRootInformationState());
 					if (currentAction.getDone()) {
-						logger.info("   action '"+currentAction+"' reached end. Popping.");
+						logger.info(Sanitizer.log("   action '"+currentAction+"' reached end. Popping."));
 						setActiveAction(null);
 					} else if (isThisActionDormant(currentAction)) {
-						logger.info("   action '"+currentAction+"' is dormant.");
+						logger.info(Sanitizer.log("   action '"+currentAction+"' is dormant."));
 					} else break;
 				} else {
 					break;
@@ -448,7 +449,7 @@ public class RewardDM extends DM {
 			logger.warn("POSSIBLE DIALOG LOOP: "+loops);
 			logger.warn("\n"+stateTracker);
 			if (!StringUtils.isEmptyString(loopEvent)) {
-				logger.info("sending loop event: "+loopEvent);
+				logger.info(Sanitizer.log("sending loop event: "+loopEvent));
 				TimerTask task = new TimerTask() {
 					@Override
 					public void run() {
@@ -469,7 +470,7 @@ public class RewardDM extends DM {
 		DialogueAction currentAction=getCurrentActiveAction();
 		Event handledEvent=null; // contains the event that the selected action handles.
 		if ((currentAction==null) || ((ev!=null) && !currentAction.handles(ev))) {
-			logger.info("  current action '"+currentAction+"' cannot handle event '"+ev+"'. Searching for other action.");
+			logger.info(Sanitizer.log("  current action '"+currentAction+"' cannot handle event '"+ev+"'. Searching for other action."));
 
 			op_mode=(op_mode!=null)?op_mode:selectAndPushBestOperatorForGivenEvent(ev,currentAction);
 			if (op_mode!=null) {
@@ -480,12 +481,12 @@ public class RewardDM extends DM {
 				Event hev=null;
 				if (ev!=null && ec!=null && (hev=ec.handlesWhich(ev))!=null) {
 					handledEvent=hev;
-					logger.info("  selected entrance condition handles event '"+handledEvent+"'.");
+					logger.info(Sanitizer.log("  selected entrance condition handles event '"+handledEvent+"'."));
 				}
 			}
 		} else if (currentAction!=null && ev!=null) {
 			handledEvent=currentAction.handlesWhich(ev);
-			logger.info("  the current action handles event '"+handledEvent+"'.");
+			logger.info(Sanitizer.log("  the current action handles event '"+handledEvent+"'."));
 		}
 
 		return handledEvent;
@@ -517,7 +518,7 @@ public class RewardDM extends DM {
 		if (ev!=null) {
 			String evName=ev.getName();
 			if (!StringUtils.isEmptyString(evName)) {
-				logger.info("starting autoupdate of information state: "+evName);
+				logger.info(Sanitizer.log("starting autoupdate of information state: "+evName));
 				if (dp.getISUpdatesMatcher()!=null) {
 					Set<List<DialogueOperatorEffect>> effs = dp.getISUpdatesMatcher().match(evName);
 					if(logger.isDebugEnabled()) logger.debug(" firing these event driven updates: "+effs);
@@ -551,7 +552,7 @@ public class RewardDM extends DM {
 		DialogueKB localIS = getInformationState();
 		DialogueKB baseIS=getRootInformationState();
 		if (ev!=null) {
-			logger.info("updating IS("+localIS.getName()+") with event of class "+ev.getClass());
+			logger.info(Sanitizer.log("updating IS("+localIS.getName()+") with event of class "+ev.getClass()));
 			if (trackers!=null) for(ValueTracker vt:trackers) vt.updateIS();
 			if (ev instanceof DMSpeakEvent)	{
 				updateUserEventsHistory(ev);
@@ -767,15 +768,15 @@ public class RewardDM extends DM {
 		for(DialogueAction a:sacts.getDormantActions()) {
 			DialogueOperator op=a.getOperator();
 			if(!op.isReEntrable()) {
-				logger.info("Removing dormant action: "+op.getName()+" because has no re-entrance options.");
+				logger.info(Sanitizer.log("Removing dormant action: "+op.getName()+" because has no re-entrance options."));
 				if (toBeRemoved==null) toBeRemoved=new ArrayList<DialogueOperator>();
 				toBeRemoved.add(op);
 			} else if (sacts.shouldThisActionBeForgotten(a)) {
-				logger.info("Removing dormant action: "+op.getName()+" because has reached forget time.");
+				logger.info(Sanitizer.log("Removing dormant action: "+op.getName()+" because has reached forget time."));
 				if (toBeRemoved==null) toBeRemoved=new ArrayList<DialogueOperator>();
 				toBeRemoved.add(op);
 			} else if (a.isInInvalidState()) {
-				logger.info("Removing dormant action: "+op.getName()+" because its state is INVALID.");
+				logger.info(Sanitizer.log("Removing dormant action: "+op.getName()+" because its state is INVALID."));
 				if (toBeRemoved==null) toBeRemoved=new ArrayList<DialogueOperator>();
 				toBeRemoved.add(op);
 			} else if (a.getDone()) {
@@ -811,7 +812,7 @@ public class RewardDM extends DM {
 			Event hev=null;
 			if (currentAction!=null && (hev=currentAction.handlesWhich(ev))!=null) {
 				DialogueOperatorEntranceTransition fake=DialogueOperatorEntranceTransition.createFakeEntraceConditionForEventAndOperator(hev.getName(),currentAction.getOperator());
-				logger.info("Creating fake entrance condition for current action(="+currentAction+") for event: "+hev.getName());
+				logger.info(Sanitizer.log("Creating fake entrance condition for current action(="+currentAction+") for event: "+hev.getName()));
 				return new FoundDialogueOperatorEntranceTransition(new WeightedDialogueOperatorEntranceTransition(fake,0f),
 						SearchTermination.KEEP_CURRENT_ACTION_HANDLE_EVENT);
 			} else {
@@ -861,10 +862,10 @@ public class RewardDM extends DM {
 	// it may chose to ignore the given event and pick some other operator
 	private FoundDialogueOperatorEntranceTransition selectAndPushBestOperatorForGivenEvent(Event ev, DialogueAction currentAction) throws Exception {
 		assert(activeAction==currentAction);
-		logger.info("   Searching for best operator for event: "+ev);
+		logger.info(Sanitizer.log("   Searching for best operator for event: "+ev));
 		NextActionSelector br=findBestEntranceCondition4Operator2(ev,currentAction);
 		FoundDialogueOperatorEntranceTransition ec = br.getBest();
-		logger.info("   FOUND: "+ec);
+		logger.info(Sanitizer.log("   FOUND: "+ec));
 
 		// if change happens too soon while waiting for user input, cancel the change.
 		if (isChangeDrivenByNonUserEvent(ec, ev, currentAction) && currentAction.isWaitingForUser()) {
@@ -874,7 +875,7 @@ public class RewardDM extends DM {
 				float time=currentAction.getTimerEventsInCurrentState()*interval;
 				int th=config.getWaitForUserReplyTimeout();
 				if (time<th) {
-					logger.info("   OVERWRITE CHANGE DECISION because waiting for user reply and only: "+time+" of "+th+" seconds elapsed.");
+					logger.info(Sanitizer.log("   OVERWRITE CHANGE DECISION because waiting for user reply and only: "+time+" of "+th+" seconds elapsed."));
 					return null; 
 				}
 			}
@@ -913,15 +914,15 @@ public class RewardDM extends DM {
 			if (ignoredUserEvent==null) ignoredUserEvent=unhandledUserEvent; // fall back to unhandled event
 			if (ignoredUserEvent!=null) {
 				if (ignoredUserEvent==unhandledUserEvent && (getSpeakingTracker().isSpeaking() || getSpeakingTracker().getInterruptionSourceEvent()==ev) && getConfiguration().getSkipUnhandledWhileSystemSpeaking()) {
-					logger.info(" ignored user event, skipping looking for an immediate handler for '"+ignoredUserEvent+"' as system configured to skip unhandled event while speaking.");
+					logger.info(Sanitizer.log(" ignored user event, skipping looking for an immediate handler for '"+ignoredUserEvent+"' as system configured to skip unhandled event while speaking."));
 				} else {
-					logger.info(" ignored user event, checking best immediate handler for '"+ignoredUserEvent+"' event.");
+					logger.info(Sanitizer.log(" ignored user event, checking best immediate handler for '"+ignoredUserEvent+"' event."));
 					incrementUnhandledEventTracker();
 					FoundDialogueOperatorEntranceTransition unhandledEC=getBestImmediateHandlerForEvent(ignoredUserEvent,currentAction);
 					if (unhandledEC!=null) {
 						//if (ignoredUserEvent==forcedIgnoreUserEvent) System.exit(1);
 						ec=unhandledEC;
-						logger.info("   FOUND: "+ec);
+						logger.info(Sanitizer.log("   FOUND: "+ec));
 						String originatingEventName=ev.getName();
 						ev.setName(ignoredUserEvent.getName());
 						if (ev instanceof NLUEvent) {
@@ -1077,7 +1078,7 @@ public class RewardDM extends DM {
 	public NLUOutput selectNLUOutput(String text,Long sessionId,List<NLUOutput> userSpeechActs) throws Exception {
 		if (userSpeechActs!=null && !userSpeechActs.isEmpty()) {
 			NLUOutput speechAct = userSpeechActs.get(0);
-			logger.info(" highest probability user event is: "+speechAct);
+			logger.info(Sanitizer.log(" highest probability user event is: "+speechAct));
 			return speechAct;
 		}
 		else {
@@ -1382,7 +1383,7 @@ public class RewardDM extends DM {
 				}
 			},highSpeedTimerDelay,highSpeedTimerDelay);
 		} else {
-			logger.info("NOT starting high speed thread as default thread runs every: "+msTimerDelay+"[ms] (high speed is: "+highSpeedTimerDelay+"[ms]).");
+			logger.info(Sanitizer.log("NOT starting high speed thread as default thread runs every: "+msTimerDelay+"[ms] (high speed is: "+highSpeedTimerDelay+"[ms])."));
 		}
 		
 		if (getTimerThread() != null)

@@ -1,12 +1,8 @@
 package edu.usc.ict.nl.bus;
 
-import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.xml.bind.JAXBContext;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -17,30 +13,20 @@ import edu.usc.ict.nl.bus.events.DMSpeakEvent;
 import edu.usc.ict.nl.bus.events.Event;
 import edu.usc.ict.nl.bus.events.NLGEvent;
 import edu.usc.ict.nl.bus.events.NLUEvent;
+import edu.usc.ict.nl.bus.events.changes.DMStateChangeEvent;
 import edu.usc.ict.nl.bus.events.changes.DMVarChangeEvent;
 import edu.usc.ict.nl.bus.events.changes.DMVarChangesEvent;
-import edu.usc.ict.nl.bus.events.changes.DMStateChangeEvent;
 import edu.usc.ict.nl.bus.modules.DM;
 import edu.usc.ict.nl.bus.modules.NLGInterface;
 import edu.usc.ict.nl.bus.modules.NLUInterface;
 import edu.usc.ict.nl.bus.protocols.Protocol;
-import edu.usc.ict.nl.bus.special_variables.SpecialVar;
 import edu.usc.ict.nl.config.NLBusConfig;
 import edu.usc.ict.nl.dm.reward.model.DialogueOperatorEffect;
-import edu.usc.ict.nl.kb.DialogueKB;
 import edu.usc.ict.nl.kb.DialogueKBInterface;
 import edu.usc.ict.nl.kb.InformationStateInterface.ACCESSTYPE;
 import edu.usc.ict.nl.nlu.NLUOutput;
-import edu.usc.ict.nl.pml.PMLStateKeeper;
-import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.LogConfig;
-import edu.usc.ict.nl.vhmsg.VHBridge;
-import edu.usc.ict.nl.vhmsg.VHBridge.VRPerception;
-import edu.usc.ict.nl.vhmsg.VHBridgewithMinat;
-import edu.usc.ict.nl.vhmsg.VHBridgewithMinat.Minat;
-import edu.usc.ict.nl.vhmsg.VHBridgewithMinat.Minat.Decision;
-import edu.usc.ict.perception.pml.Pml;
-import edu.usc.ict.vhmsg.MessageListener;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 /**
  * This class contains all methods required to process events and communicate between the three main NL sub-modules: NLU, DM and NLG.
@@ -92,10 +78,10 @@ public class NLBus extends NLBusBase {
 							informationState.setValueOfVariable(lengthOfLastThingUserSaidVarName,0,ACCESSTYPE.AUTO_OVERWRITEAUTO);
 						} else {
 							informationState.setValueOfVariable(lengthOfLastThingUserSaidVarName, seconds,ACCESSTYPE.AUTO_OVERWRITEAUTO);
-							logger.warn("User last utterance length="+seconds+" [s]");
+							logger.warn(Sanitizer.log("User last utterance length="+seconds+" [s]"));
 							DialogueOperatorEffect incrementLengthOfLastUserTurnVar=DialogueOperatorEffect.createIncrementForVariable(lengthOfLastUserTurnVarName,seconds);
 							informationState.store(incrementLengthOfLastUserTurnVar, ACCESSTYPE.AUTO_OVERWRITEAUTO, true);
-							logger.warn("User turn length="+informationState.getValueOfVariable(lengthOfLastUserTurnVarName,ACCESSTYPE.AUTO_OVERWRITEAUTO,null)+" [s]");
+							logger.warn(Sanitizer.log("User turn length="+informationState.getValueOfVariable(lengthOfLastUserTurnVarName,ACCESSTYPE.AUTO_OVERWRITEAUTO,null)+" [s]"));
 						}
 					}
 				}
@@ -197,7 +183,7 @@ public class NLBus extends NLBusBase {
 	 */
 	@Override
 	public void handleTextUtteranceEvent(Long sessionId, String text) throws Exception {
-		logger.info("Text utterance event received for session "+sessionId+": '"+text+"'");
+		logger.info(Sanitizer.log("Text utterance event received for session "+sessionId+": '"+text+"'"));
 		if (isInExecuteMode()) {
 			if (hasListeners()) {
 				for(ExternalListenerInterface l:getListeners()) {
@@ -205,7 +191,7 @@ public class NLBus extends NLBusBase {
 				}
 			}
 			NLUOutput nluOutput=getNLUOutput(sessionId, text);
-			logger.info("Text utterance classified into: '"+nluOutput+"'");
+			logger.info(Sanitizer.log("Text utterance classified into: '"+nluOutput+"'"));
 			if (nluOutput!=null) {
 				NLUEvent ev = new NLUEvent(nluOutput, sessionId);
 				if (!getConfiguration().getDmVhListening()) {

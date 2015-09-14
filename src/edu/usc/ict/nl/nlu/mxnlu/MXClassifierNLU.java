@@ -33,6 +33,7 @@ import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class MXClassifierNLU extends NLU {
 
@@ -148,7 +149,7 @@ public class MXClassifierNLU extends NLU {
 	}
 	public String doPreprocessingForClassify(String text) throws Exception {
 		String processedText=(getConfiguration().getApplyTransformationsToInputText())?getBTD().prepareUtteranceForClassification(text):text;
-		if (logger.isDebugEnabled()) logger.info("input text: '"+text+"'");
+		if (logger.isDebugEnabled()) logger.info(Sanitizer.log("input text: '"+text+"'"));
 		String features=FunctionalLibrary.printCollection(getFeaturesFromUtterance(processedText),"",""," ");
 		if (StringUtils.isEmptyString(features)) features=processedText;
 		return features;
@@ -157,7 +158,7 @@ public class MXClassifierNLU extends NLU {
 		NLUOutput hardLabel=getHardLinkMappingOf(text);
 		if (hardLabel!=null) return new String[]{hardLabel.getId()};
 		String features=doPreprocessingForClassify(text);
-		if (logger.isDebugEnabled()) logger.info("nlu input line: '"+features+"'");
+		if (logger.isDebugEnabled()) logger.info(Sanitizer.log("nlu input line: '"+features+"'"));
 		return (nBest!=null)?getNLUProcess().classify(features,nBest):getNLUProcess().classify(features);
 	}
 
@@ -182,7 +183,7 @@ public class MXClassifierNLU extends NLU {
 		Map<String, Float> userSpeechActsWithProb = processNLUOutputs(rawNLUOutput,nBest,possibleUserEvents,sortedUserSpeechActs);		
 		String classifierText = getClassifierInputUtteranceBeforeGeneralization(inputText);
 		List<Pair<String, Map<String, Object>>> speechActsWithPayload = associatePayloadToSpeechActs(sortedUserSpeechActs, classifierText);
-		logger.debug("Extracted payload for each input user speech act: "+speechActsWithPayload);
+		logger.debug(Sanitizer.log("Extracted payload for each input user speech act: "+speechActsWithPayload));
 		// build output
 		List<NLUOutput> ret=new ArrayList<NLUOutput>();
 		for(Pair<String,Map<String, Object>> usa:speechActsWithPayload) {
@@ -199,7 +200,7 @@ public class MXClassifierNLU extends NLU {
 	private Map<String,Float> processNLUOutputs(String[] nlu,Integer nBest, Set<String> possibleUserEvents,ArrayList<String> sortedOutputKeys) throws Exception {
 		Float acceptanceThreshold=this.acceptanceThreshold;
 		NLUConfig config=getConfiguration();
-		logger.debug("PROCESS NLU: input user speechActs: "+((nlu==null)?nlu:Arrays.asList(nlu)));
+		logger.debug(Sanitizer.log("PROCESS NLU: input user speechActs: "+((nlu==null)?nlu:Arrays.asList(nlu))));
 		if (sortedOutputKeys!=null) sortedOutputKeys.clear();
 		if (nlu==null) return null;
 				
@@ -226,7 +227,7 @@ public class MXClassifierNLU extends NLU {
 						if (userEvents.size()<=nBest) {
 							userEvents.put(sa,prb);
 							if (sortedOutputKeys!=null) sortedOutputKeys.add(sa);
-							logger.debug(" user speechAct: "+sa+" with probability "+prb);
+							logger.debug(Sanitizer.log(" user speechAct: "+sa+" with probability "+prb));
 							if (possibleUserEvents!=null) {
 								possibleUserEvents.remove(sa);
 								if (possibleUserEvents.size()<=0) break;
@@ -235,7 +236,7 @@ public class MXClassifierNLU extends NLU {
 					}
 				}
 			} catch (NumberFormatException e) {
-				logger.error(" probability associated with '"+s+"' is not a number.");
+				logger.error(Sanitizer.log(" probability associated with '"+s+"' is not a number."));
 			}
 		}
 		// if no event is left: update the current state by following all user edges (this is the case
@@ -285,7 +286,7 @@ public class MXClassifierNLU extends NLU {
 			} else {
 				result.add(false);
 				if (printMistakes) {
-					logger.error(generateErrorString(sortedNLUOutput,td,modelFile));
+					logger.error(Sanitizer.log(generateErrorString(sortedNLUOutput,td,modelFile)));
 				}
 			}
 		}
@@ -320,7 +321,7 @@ public class MXClassifierNLU extends NLU {
 		List<TrainingDataFormat> td =btd.buildTrainingDataFromNLUFormatFile(trainingFile);
 		if (td!=null && !td.isEmpty()) {
 			Set<String> sas = BuildTrainingData.getAllSpeechActsInTrainingData(td);
-			if (maximumNumberOfLabels!=null && sas.size()>maximumNumberOfLabels) logger.error("skipping training because too many labels ("+sas.size()+">"+maximumNumberOfLabels+") in "+trainingFile);
+			if (maximumNumberOfLabels!=null && sas.size()>maximumNumberOfLabels) logger.error(Sanitizer.log("skipping training because too many labels ("+sas.size()+">"+maximumNumberOfLabels+") in "+trainingFile));
 			else {
 		
 		        td=btd.cleanTrainingData(td);
@@ -336,7 +337,7 @@ public class MXClassifierNLU extends NLU {
 			throws Exception {
 		Integer maximumNumberOfLabels=getConfiguration().getMaximumNumberOfLabels();
 		Set<String> sas = BuildTrainingData.getAllSpeechActsInTrainingData(td);
-		if (maximumNumberOfLabels!=null && sas.size()>maximumNumberOfLabels) logger.error("skipping training because too many labels ("+sas.size()+">"+maximumNumberOfLabels+") in training data");
+		if (maximumNumberOfLabels!=null && sas.size()>maximumNumberOfLabels) logger.error(Sanitizer.log("skipping training because too many labels ("+sas.size()+">"+maximumNumberOfLabels+") in training data"));
 		else {
 			NLUConfig config=getConfiguration();
 			trainNLUOnThisData(td, new File(config.getNluTrainingFile()), model);

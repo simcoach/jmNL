@@ -21,6 +21,7 @@ import edu.usc.ict.nl.kb.DialogueKBInterface;
 import edu.usc.ict.nl.kb.InformationStateInterface.ACCESSTYPE;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SpeakingTracker {
 
@@ -79,7 +80,7 @@ public class SpeakingTracker {
 		durationOfThingSpoken=dm.getMessageBus().getNlg(dm.getSessionID()).getDurationOfThisDMEvent(dm.getSessionID(), speakingThis);
 		durationOfAudioPortionOfThingSpoken=durationOfThingSpoken;
 		final String say=getSpeakingSpeechAct();
-		dm.getLogger().info("got duration for event: "+say+" as: "+durationOfThingSpoken);
+		dm.getLogger().info(Sanitizer.log("got duration for event: "+say+" as: "+durationOfThingSpoken));
 		if (isSpeaking()) {
 			timeStartedSpeaking=System.currentTimeMillis();
 			DialogueKBInterface is = dm.getInformationState();
@@ -94,7 +95,7 @@ public class SpeakingTracker {
 				dm.getLogger().warn(" -> ms until execution: "+(System.currentTimeMillis()-tasks.get(say).scheduledExecutionTime()));
 			} else {
 				long ms=Math.round(duration*1000);
-				dm.getLogger().info("Setting up BACKUP animation complete sender for '"+say+"' with duration: "+duration);
+				dm.getLogger().info(Sanitizer.log("Setting up BACKUP animation complete sender for '"+say+"' with duration: "+duration));
 				TimerTask task = new TimerTask() {
 					@Override
 					public void run() {
@@ -142,17 +143,17 @@ public class SpeakingTracker {
 			Float f=getSpokenFraction();
 			Float th=dm.getConfiguration().getSpokenFractionForSaid();
 			if (f != null && th!=null && f<th) {
-				dm.getLogger().info("setting action '"+waitingAction+"' as interrupted. Percentage completed: "+f+" th="+th);
+				dm.getLogger().info(Sanitizer.log("setting action '"+waitingAction+"' as interrupted. Percentage completed: "+f+" th="+th));
 				waitingAction.setTransitionAsInterrupted(waitingTransitionWithState.getFirst());
 			} else {
-				dm.getLogger().info("setting action '"+waitingAction+"' as said. Percentage completed: "+f+" th="+th);
+				dm.getLogger().info(Sanitizer.log("setting action '"+waitingAction+"' as said. Percentage completed: "+f+" th="+th));
 				waitingAction.setTransitionAsSaid(waitingTransitionWithState.getFirst());
 			}
 			if (waitingAction.isPaused()) {
 				if (!spokenSpeechAct.equals(thingSaid)) {
-					dm.getLogger().error("no match between waiting event: '"+spokenSpeechAct+"' and received done event. Doing NOTHING.");
+					dm.getLogger().error(Sanitizer.log("no match between waiting event: '"+spokenSpeechAct+"' and received done event. Doing NOTHING."));
 				} else {
-					dm.getLogger().info("MATCH between waiting event: '"+spokenSpeechAct+"' and received done event. AWAKENING action '"+waitingAction.getOperator().getName()+"'");
+					dm.getLogger().info(Sanitizer.log("MATCH between waiting event: '"+spokenSpeechAct+"' and received done event. AWAKENING action '"+waitingAction.getOperator().getName()+"'"));
 					DialogueAction actionToBeAwoken=waitingAction;
 					DialogueOperatorNodeTransition transitionToBeTaken=waitingTransitionWithState.getFirst();
 					Event sourceEvent=waitingTransitionWithState.getSecond();
@@ -178,9 +179,9 @@ public class SpeakingTracker {
 			}
 		} else {
 			if (!hasAlreadyAWaitingAction())
-				dm.getLogger().info("Received an animation complete for "+thingSaid+" but no waiting action.");
+				dm.getLogger().info(Sanitizer.log("Received an animation complete for "+thingSaid+" but no waiting action."));
 			else
-				dm.getLogger().error("Incorrect speaking tracker state: "+speakingThis+" action: "+waitingAction+" paused while taking transiton: "+waitingTransitionWithState);
+				dm.getLogger().error(Sanitizer.log("Incorrect speaking tracker state: "+speakingThis+" action: "+waitingAction+" paused while taking transiton: "+waitingTransitionWithState));
 			resetTrackerState();
 		}
 	}
