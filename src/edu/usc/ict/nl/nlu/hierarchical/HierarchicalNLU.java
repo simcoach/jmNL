@@ -37,6 +37,7 @@ import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.Triple;
 import edu.usc.ict.nl.util.graph.Node;
 import edu.usc.ict.nl.utils.ExcelUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class HierarchicalNLU extends NLU {
 
@@ -332,7 +333,7 @@ public class HierarchicalNLU extends NLU {
 				Matcher m=hierModelLine.matcher(line);
 				if (m.matches() && (m.groupCount()==2)) {
 					String nodeName=m.group(1);
-					File thisNodeModelFile=new File(m.group(2));
+					File thisNodeModelFile = new File(Sanitizer.file(m.group(2)));
 					NLUConfig internalConfig=(NLUConfig) config.clone();
 					internalConfig.setNluHardLinks(null);
 					internalConfig.setNluModelFile(thisNodeModelFile.getName());

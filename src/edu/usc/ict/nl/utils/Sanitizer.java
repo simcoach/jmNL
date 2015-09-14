@@ -1,6 +1,6 @@
 package edu.usc.ict.nl.utils;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 public final class Sanitizer {
 
@@ -16,5 +16,9 @@ public final class Sanitizer {
 	
 	public static String file(String s) {
 		return s;
+	}
+	
+	public static String file(final String parent, final String child) {
+		return Paths.get(parent, child).getFileName().toString();
 	}
 }

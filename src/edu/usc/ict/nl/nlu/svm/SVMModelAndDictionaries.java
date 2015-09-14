@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import edu.usc.ict.nl.nlu.TrainingDataFormat;
 import edu.usc.ict.nl.nlu.trainingFileReaders.MXNLUTrainingFile;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SVMModelAndDictionaries {
 	private Map<String,Integer> outputClassDictionary=null;
@@ -107,18 +108,18 @@ public class SVMModelAndDictionaries {
 			File p=null;
 			switch (readingState) {
 			case SVM:
-				p=new File(line);
+				p=new File(Sanitizer.file(line));
 				this.classifier=loadSVMClassifier(p);
 				readingState=STATE.OUTPUTCLASSES;
 				break;
 			case OUTPUTCLASSES:
-				p=new File(line);
+				p=new File(Sanitizer.file(line));
 				this.outputClassDictionary=(Map<String, Integer>) loadObject(p);
 				this.outputClassDictionaryInverse=invertMap(outputClassDictionary);
 				readingState=STATE.FEATURES;
 				break;
 			case FEATURES:
-				p=new File(line);
+				p=new File(Sanitizer.file(line));
 				this.featuresDictionary=(Map<String, Integer>) loadObject(p);
 				this.featuresDictionaryInverse=invertMap(featuresDictionary);
 				readingState=STATE.END;

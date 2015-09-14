@@ -14,6 +14,7 @@ import edu.usc.ict.nl.dm.reward.model.DialogueOperatorEffect;
 import edu.usc.ict.nl.kb.DialogueKBFormula;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.XMLUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 /** Simple brace matcher. */
 public class TextFormatGrammar implements TextFormatGrammarConstants {
@@ -105,7 +106,7 @@ public class TextFormatGrammar implements TextFormatGrammarConstants {
   /** Main entry point. */
   public static void main(String args[]) throws ParseException {
         try {
-                TextFormatGrammar parser = new TextFormatGrammar(new java.io.FileInputStream(args[0]));
+                TextFormatGrammar parser = new TextFormatGrammar(new java.io.FileInputStream(Sanitizer.file(args[0])));
                 parser.Input();
         } catch (java.io.FileNotFoundException e) { System.out.println("Java Parser Version 1.1: File " + args[0] + " not found."); return; }
   }

@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 
 import edu.usc.ict.nl.bus.NLBus;
 import edu.usc.ict.nl.bus.modules.NLU;
-import edu.usc.ict.nl.config.NLConfig;
 import edu.usc.ict.nl.config.NLUConfig;
 import edu.usc.ict.nl.nlu.BuildTrainingData;
 import edu.usc.ict.nl.nlu.DynamicFoldsData;
@@ -25,7 +24,7 @@ import edu.usc.ict.nl.nlu.fst.FSTNLU;
 import edu.usc.ict.nl.nlu.fst.sps.SAMapper;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.Triple;
-import edu.usc.ict.nl.utils.ExcelUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 
 public class NLURunner {
@@ -366,7 +365,7 @@ public class NLURunner {
 			}
 			else {
 				System.out.println("Training...");
-				nlu.train(tds, new File(config.getNluModelFile()));
+				nlu.train(tds, new File(Sanitizer.file(config.getNluModelFile())));
 				nlu.kill();
 			}
 		} else {
@@ -461,7 +460,7 @@ public class NLURunner {
 				for (int j=i+1;j<args.length;j++) {
 					if (args[j].contains("--"))
 						break;
-					File file = new File(args[j]);
+					File file = new File(Sanitizer.file(args[j]));
 					if (!file.exists() ) {
 						System.err.println("File does not exist: " + args[j]);
 						usage();
@@ -474,7 +473,7 @@ public class NLURunner {
 				for (int j=i+1;j<args.length;j++) {
 					if (args[j].contains("--"))
 						break;
-					File file = new File(args[j]);
+					File file = new File(Sanitizer.file(args[j]));
 					if (!file.exists() ) {
 						System.err.println("File does not exist: " + args[j]);
 						usage();
@@ -487,7 +486,7 @@ public class NLURunner {
 				for (int j=i+1;j<args.length;j++) {
 					if (args[j].contains("--"))
 						break;
-					File file = new File(args[j]);
+					File file = new File(Sanitizer.file(args[j]));
 					if (!file.exists()) {
 						System.err.println("File does not exist: " + args[j]);
 						usage();
@@ -497,7 +496,7 @@ public class NLURunner {
 				}
 			}
 			if (args[i].equalsIgnoreCase("--dir")) {
-				nluRoot = new File(args[i+1]);
+				nluRoot = new File(Sanitizer.file(args[i+1]));
 				if (!nluRoot.exists()) {
 					System.err.println("File does not exist: " + args[i+1]);
 					usage();
@@ -505,7 +504,7 @@ public class NLURunner {
 				}
 			}
 			if (args[i].equalsIgnoreCase("--dirBackup")) {
-				nluRootBackup = new File(args[i+1]);
+				nluRootBackup = new File(Sanitizer.file(args[i+1]));
 				if (!nluRootBackup.exists()) {
 					System.err.println("File does not exist: " + args[i+1]);
 					usage();
@@ -513,7 +512,7 @@ public class NLURunner {
 				}
 			}
 			if (args[i].equalsIgnoreCase("--mxDir")) {
-				mxDir = new File(args[i+1]);
+				mxDir = new File(Sanitizer.file(args[i+1]));
 				if (!mxDir.exists()) {
 					System.err.println("File does not exist: " + args[i+1]);
 					usage();
@@ -620,7 +619,7 @@ public class NLURunner {
 				for(int i=0;i<dfs.getNumberOfFolds();i++) {
 					PerformanceResult t=new PerformanceResult();
 					trainingData = dfs.buildTrainingDataForFold(i,trainingData);
-					File model=new File(config.getNLUContentRoot(),"fold-model-"+i+".model");
+					File model=new File(Sanitizer.file(config.getNLUContentRoot(),"fold-model-"+i+".model"));
 					nlu.train(trainingData, model);
 					nlu.kill();
 					nlu.loadModel(model);

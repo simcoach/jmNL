@@ -15,6 +15,7 @@ import edu.usc.ict.nl.dm.fsm.SCXMLDisableState;
 import edu.usc.ict.nl.dm.fsm.SCXMLEnableState;
 import edu.usc.ict.nl.nlg.VRexpressBasicNLG;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class NLBusConfig extends NLConfig {
 	public static final String DM_INTERNAL_ID = "dialogManager";
@@ -192,7 +193,7 @@ public class NLBusConfig extends NLConfig {
 	public String getContentRoot() {return contentRoot;}
 	public void setContentRoot(String root) {this.contentRoot = root;}
 
-	public String getCharacterContentRoot() {return new File(getContentRoot(),getDefaultCharacter()).getAbsolutePath();}
+	public String getCharacterContentRoot() {return new File(Sanitizer.file(getContentRoot(),getDefaultCharacter())).getAbsolutePath(); }
 
 	public String getDMContentRoot() {return getCharacterContentRoot()+File.separator+"dm"+File.separator;}
 	public String getPausedSessionsRoot() {return getCharacterContentRoot()+File.separator+"pausedSessions"+File.separator;}

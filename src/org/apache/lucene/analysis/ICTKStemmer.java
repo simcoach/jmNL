@@ -44,6 +44,8 @@ import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.Hashtable;
 
+import edu.usc.ict.nl.utils.Sanitizer;
+
 /**
    This class implements the Kstem algorithm
  */
@@ -1400,7 +1402,7 @@ public class ICTKStemmer {
 	// If we get here, we are about to process a file
 
 	try {
-	    LineNumberReader reader = new LineNumberReader(new FileReader(args[0]));
+	    LineNumberReader reader = new LineNumberReader(new FileReader(Sanitizer.file(args[0])));
 
 	    line = reader.readLine();
 	    while (line != null) {
