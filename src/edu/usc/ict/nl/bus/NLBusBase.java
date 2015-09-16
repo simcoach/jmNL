@@ -60,9 +60,9 @@ import edu.usc.ict.nl.utils.Sanitizer;
  *
  */
 public abstract class NLBusBase implements NLBusInterface {
-	
+
 	protected Map<String,SpecialEntitiesRepository> character2specialVars=null;
-	
+
 	public static final Logger logger = Logger.getLogger(NLBusBase.class.getName());
 	static {
 		URL log4Jresource=LogConfig.findLogConfig("src","log4j.properties", false);
@@ -73,13 +73,13 @@ public abstract class NLBusBase implements NLBusInterface {
 	protected NLBusConfig configuration;
 	public NLBusConfig getConfiguration() {return configuration;}
 	public void setConfiguration(NLBusConfig c) {this.configuration=c;}
-		
+
 	protected static ClassPathXmlApplicationContext context;
 
 	private DM dm;
 	public DM getDM() {return dm;}
 	protected void setDM(DM dm) {this.dm=dm;}
-	
+
 	protected List<ExternalListenerInterface> listeners=null;
 	protected List<Protocol> protocols=null;
 	@Override
@@ -116,7 +116,7 @@ public abstract class NLBusBase implements NLBusInterface {
 	protected HashMap<String,Object> character2parsedPolicy=null;
 	// stores timestamps for various objects in each session. Used for randomly selecting and rpeferring earlier used things.
 	private static Map<Long,Map<Integer,Long>> session2ContentTimestamps = null;
-	
+
 	// EXECUTE MODES
 	public boolean isInExecuteMode() {return getConfiguration().isInExecuteMode();}
 	public boolean isLoadBalacingActive() {return getConfiguration().getIsLoadBalancing();}
@@ -187,7 +187,7 @@ public abstract class NLBusBase implements NLBusInterface {
 	//##############################################################################
 	// deals with dialog sessions with a particular user (start/stop/cleanup) 
 	//##############################################################################
-	
+
 	public NLUOutput getNLUforLoginEvent(Long sessionId, DM dm,
 			NLUInterface nlu) throws Exception {
 		String text=getConfiguration().getLoginEventName();
@@ -195,7 +195,7 @@ public abstract class NLBusBase implements NLBusInterface {
 		NLUOutput selectedUserSpeechAct=dm.selectNLUOutput(text,sessionId, userSpeechActs);
 		return selectedUserSpeechAct;
 	}
-	
+
 	public synchronized void setDialogSession2User(Long sessionID,String user) {
 		if (!existDialogSession(sessionID)) {
 			logger.warn(Sanitizer.log(" session "+sessionID+" set to user "+session2User.get(sessionID)+" and now being switched to user "+user));
@@ -249,13 +249,16 @@ public abstract class NLBusBase implements NLBusInterface {
 		return sid;
 	}
 	@Override
-	public void saveInformationStateForSession(Long sid,File dumpFile) throws Exception {
+	public void saveInformationStateForSession(Long sid,boolean save) throws Exception {
 		DM dm=getPolicyDMForSession(sid,false);
 		if (dm!=null) {
 			DialogueKB is = dm.getInformationState();
 			if (is!=null) {
 				is.setValueOfVariable(NLBusBase.timeLastSessionVarName,DialogueKBFormula.create(Math.round(System.currentTimeMillis()/1000)+"", null),ACCESSTYPE.AUTO_OVERWRITEAUTO);
-				if (dumpFile!=null) is.dumpKB(dumpFile);
+				if (save) {
+					File dump=getNewInformationStateFileName(sid);
+					is.dumpKB(dump);
+				}
 			}
 		}
 	}
@@ -295,11 +298,19 @@ public abstract class NLBusBase implements NLBusInterface {
 		if (sessionId!=null) {
 			DM dm=null;
 			try {
-				dm=getPolicyDMForSession(sessionId);
+				dm=getPolicyDMForSession(sessionId,false);
 			} catch (Exception e) {
 				logger.warn(Sanitizer.log("no dm available for session: "+sessionId+"  (probably it's already been terminated)."));
 			}
-			if (dm!=null && !dm.isSessionDone()) dm.kill();
+			if (dm!=null) {
+				try {
+					saveInformationStateForSession(sessionId, true);
+				} catch (Exception e) {
+					logger.warn("error while saving state of: "+sessionId+"  (during termination event).",e);
+				}
+				if (dm!=null && !dm.isSessionDone()) dm.kill();
+			}
+
 			try {
 				killNlu(sessionId);
 			} catch (Exception e) {
@@ -330,8 +341,8 @@ public abstract class NLBusBase implements NLBusInterface {
 		//only allow one handler thread to process any given streamevent
 		return handledEvents.add(eventID);
 	}
-	
-	
+
+
 	//##############################################################################
 	// library functions to find/compile/validate a dialog policy
 	//##############################################################################
@@ -341,7 +352,7 @@ public abstract class NLBusBase implements NLBusInterface {
 		policiesDirURL = ClassLoader.getSystemResource(basePoliciesURL);
 		if (policiesDirURL == null)
 			policiesDirURL = new File(basePoliciesURL).toURI().toURL();
-	
+
 		URI fileURI=policiesDirURL.toURI();
 		//URI fileURI=new File()).toURI();
 		File characterRoot=new File(fileURI);
@@ -350,9 +361,9 @@ public abstract class NLBusBase implements NLBusInterface {
 			if (policiesDirURL != null)
 				characterRoot = new File(policiesDirURL.toURI());
 		}
-		
+
 		NLBusConfig config=getConfiguration();
-		
+
 		String defaultCharacterName=config.getDefaultCharacter();
 		if (characterRoot.isDirectory()) {
 			for (File file:characterRoot.listFiles()) {
@@ -372,13 +383,13 @@ public abstract class NLBusBase implements NLBusInterface {
 		config.setDefaultCharacter(defaultCharacterName);
 		return character2unparsedPolicy;
 	}
-	
+
 	public boolean doesCharacterExist(NLBusConfig config,String characterName) {
 		String name=config.getInitialPolicyFileName();
 		File fileForName=new File(name);
 		return (fileForName!=null && fileForName.exists());
 	}
-	
+
 	public HashMap<String, Object> parseAvailablePolicies(HashMap<String, String> unparsedPolicies) {
 		character2parsedPolicy.clear();
 		Set<String> toBeRemoved=null;
@@ -438,18 +449,18 @@ public abstract class NLBusBase implements NLBusInterface {
 		if (character2unparsedPolicy.containsKey(characterName))
 			character2unparsedPolicy.remove(characterName);
 		if (character2parsedPolicy.containsKey(characterName))
-				character2parsedPolicy.remove(characterName);
+			character2parsedPolicy.remove(characterName);
 	}
 	public Map<String,String> getAvailableCharacterNames() {return character2unparsedPolicy;}
-		
+
 	public boolean isCharacterPolicyActive(String characterName) {
 		return character2parsedPolicy.containsKey(characterName);
 	}
-	
+
 	public Set<String> getActiveCharacterPolicies() {return character2parsedPolicy.keySet();}
-	
-	
-	
+
+
+
 	//##############################################################################
 	//    Method to deal with storing received DM events 
 	//##############################################################################
@@ -551,7 +562,7 @@ public abstract class NLBusBase implements NLBusInterface {
 			nlu.kill();
 		}
 	}
-	
+
 	//##############################################################################
 	//  GET/CREATE NLG for a specific session
 	//##############################################################################
@@ -575,7 +586,7 @@ public abstract class NLBusBase implements NLBusInterface {
 		}
 		return null;
 	}
-	
+
 	//##############################################################################
 	//  methods used to create all modules that are configured using an NLConfig object
 	//##############################################################################
@@ -623,56 +634,56 @@ public abstract class NLBusBase implements NLBusInterface {
 	public SpecialEntitiesRepository getSpecialVariablesForCharacterName(String characterName) {
 		SpecialEntitiesRepository svs=new SpecialEntitiesRepository(getConfiguration());
 		new SpecialVar(svs,userSpeakingStateVarName,"Boolean flag that if true indicates that the user is speacking","false",Boolean.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,lengthOfLastThingUserSaidVarName,"Number of seconds the user has spoken last.","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,lengthOfLastUserTurnVarName,"Number of seconds the user has spoken since the last system intervention.","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,systemSpeakingStateVarName,"Boolean flag that if true indicates that the system is speacking","false",Boolean.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,systemSpeakingCompletionVarName,"fraction of the system utterance being said that has been currently spoken. Updated at each timer interval.","1",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,timeSinceLastUserActionVariableName,"Time in seconds since the last thing said by the user.","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,timeSinceLastSystemActionVariableName,"Time in seconds since the last thing said by the system.","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,counterConsecutiveUnhandledUserActionsVariableName,"Number of consecutive user actions for which the system had no direct response (handler) across the entire dialogue.","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,counterConsecutiveUnhandledUserActionsSinceLastSystemActionVariableName,"Number of consecutive user actions to which the system didn't have an handler within the same user turn.","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,timeSinceLastActionVariableName,"Time in seconds since anyone said something (user or system).","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,timeLastSessionVarName,"Time in seconds since 1970 of the end of last session (when information state was saved).","null",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),true);
+				null,null,true);
 		new SpecialVar(svs,timeSinceLastResourceVariableName,"Time in seconds since the last resource link/video was given.","0",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,timeSinceStartVariableName,"Time in seconds since the login event.","null",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,lastEventVariableName,"Name of last speech act received by the system. After the search is done, it contains the single speech act dealt by the selected network.",null,String.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,hasUserSaidSomethingVariableName,"Name of last speech act received by the system. Not affected by search selection.",null,String.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),true);
+				null,null,true);
 		new SpecialVar(svs,lastNonNullOperatorVariableName,"Name of last sub-dialog executed by the system.",null,String.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),true);
+				null,null,true);
 		new SpecialVar(svs,lastSystemSayVariableName,"Name of the speech act last said by the system.",null,String.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,timerIntervalVariableName,"Time in seconds between 2 consecutive timer events.","1",Number.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		// special variables that should be hidden from the suer using the dialog editor application.
-		new SpecialVar(svs,dmVariableName,"DM instance.",null,null,true,VariableProperties.getDefault(PROPERTY.READONLY),false);
+		new SpecialVar(svs,dmVariableName,"DM instance.",null,null,true,null,null);
 		new SpecialVar(svs,activeActionVariableName,"String representation of the current active action.",null,String.class,
-				true,VariableProperties.getDefault(PROPERTY.READONLY),false);
+				true,null,null);
 		new SpecialVar(svs,dormantActionsVariableName,"Current List of dormant actions.",null,String.class,
-				true,VariableProperties.getDefault(PROPERTY.READONLY),false);
+				true,null,null);
 		new SpecialVar(svs,preferFormsVariableName,"If true and a form is available for the current system speech act, the form will be selected by the NLG.","true",Boolean.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),true);
+				null,null,true);
 		new SpecialVar(svs,tmpEventVariableName,"Variable used to store the input event that generated one of the internal events (e.g. unhandled, ignore and loop).",null,String.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),false);
+				null,null,null);
 		new SpecialVar(svs,userEventsHistory,"Stores a list of lists of NLUEvents received by the character. The first is the most recent (stack). When a system event is received the next incoming user events are collected in a new list element.",null,Deque.class,
-				true,VariableProperties.getDefault(PROPERTY.READONLY),false);
+				true,null,null);
 		new SpecialVar(svs,lastUserText,"Stores the last text the user said, as received by the DM.",null,String.class,
-				VariableProperties.getDefault(PROPERTY.HIDDEN),VariableProperties.getDefault(PROPERTY.READONLY),true);
-		
+				null,null,true);
+
 		if (hasProtocols()) {
 			for(Protocol p:getProtocols()) {
 				if (p!=null) {
@@ -689,7 +700,7 @@ public abstract class NLBusBase implements NLBusInterface {
 				}
 			}
 		}
-		
+
 		try {
 			NLUConfig config=getNLUConfigurationForCharacter("");
 			List<NamedEntityExtractorI> nes = config.getNluNamedEntityExtractors();
@@ -741,12 +752,18 @@ public abstract class NLBusBase implements NLBusInterface {
 		if (bus!=null) {
 			Class cc = Class.forName(className);
 			Class busClass=bus.getClass();
-			Constructor constructor = cc.getConstructor(busClass);
-			return (Protocol) constructor.newInstance(bus);
+			while(busClass!=null) {
+				try {
+					Constructor constructor = cc.getConstructor(busClass);
+					return (Protocol) constructor.newInstance(bus);
+				} catch (NoSuchMethodException e) {
+					busClass=busClass.getSuperclass();
+				}
+			}
 		}
 		return null;
 	}
-	
+
 	public NLBusBase() throws Exception {
 		character2specialVars=new HashMap<String,SpecialEntitiesRepository>();
 		session2User=new ConcurrentHashMap<Long, String>();
