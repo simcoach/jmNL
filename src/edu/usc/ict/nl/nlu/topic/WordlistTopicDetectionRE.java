@@ -20,6 +20,7 @@ import edu.usc.ict.nl.nlu.mxnlu.MXClassifierNLU;
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class WordlistTopicDetectionRE extends NLU {
 
@@ -101,8 +102,8 @@ public class WordlistTopicDetectionRE extends NLU {
 
 	@Override
 	public PerformanceResult test(File testFile, File modelFile, boolean printErrors) throws Exception {
-		if (!testFile.isAbsolute()) testFile=new File(getConfiguration().getNLUContentRoot(),testFile.getPath());
-		if (!modelFile.isAbsolute()) modelFile=new File(getConfiguration().getNLUContentRoot(),modelFile.getPath());
+		if (!testFile.isAbsolute()) testFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),testFile.getPath()));
+		if (!modelFile.isAbsolute()) modelFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),modelFile.getPath()));
 		BuildTrainingData btd=getBTD();
 		List<TrainingDataFormat> td=btd.buildTrainingDataFromNLUFormatFile(testFile);
 

@@ -36,7 +36,7 @@ public class WordlistTopicDetection extends NLU {
 	public WordlistTopicDetection(NLUConfig c) throws Exception {
 		super(c);
 		String nluModel=c.getNluModelFile();
-		loadModel(new File(nluModel));
+		loadModel(new File(Sanitizer.file(nluModel)));
 	}
 	
 	private static final Pattern hierModelLine=Pattern.compile("^([^\\s]+)[\\s]+(.+)$");
@@ -50,7 +50,7 @@ public class WordlistTopicDetection extends NLU {
 				Matcher m=hierModelLine.matcher(line);
 				if (m.matches() && (m.groupCount()==2)) {
 					String topicIdentifier=m.group(1);
-					File thisNodeModelFile=new File(getConfiguration().getNLUContentRoot(),new File(m.group(2)).getName());
+					File thisNodeModelFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),new File(m.group(2)).getName()));
 					if (topics==null) topics=new ArrayList<WordlistTopicDetection.TopicMatcher>();
 					topics.add(new TopicMatcher(topicIdentifier,thisNodeModelFile));
 				}
@@ -150,8 +150,8 @@ public class WordlistTopicDetection extends NLU {
 
 	@Override
 	public PerformanceResult test(File testFile, File modelFile, boolean printErrors) throws Exception {
-		if (!testFile.isAbsolute()) testFile=new File(getConfiguration().getNLUContentRoot(),testFile.getPath());
-		if (!modelFile.isAbsolute()) modelFile=new File(getConfiguration().getNLUContentRoot(),modelFile.getPath());
+		if (!testFile.isAbsolute()) testFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),testFile.getPath()));
+		if (!modelFile.isAbsolute()) modelFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),modelFile.getPath()));
 		BuildTrainingData btd=getBTD();
 		List<TrainingDataFormat> td=btd.buildTrainingDataFromNLUFormatFile(testFile);
 
