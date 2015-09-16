@@ -2,7 +2,6 @@ package edu.usc.ict.nl.dm.reward.trackers;
 
 import java.util.concurrent.Semaphore;
 
-import edu.usc.ict.nl.bus.special_variables.SpecialVar;
 import edu.usc.ict.nl.dm.reward.RewardDM;
 
 

@@ -24,7 +24,9 @@ import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SpeakingTracker {
-
+	
+    static final Logger logger = Logger.getLogger(SpeakingTracker.class);
+	
 	private boolean waitForSystemDone=false;
 	private NLGEvent speakingThis=null;
 	private Float durationOfThingSpoken=0f;
@@ -51,7 +53,7 @@ public class SpeakingTracker {
 				if ((duration==null) || (duration>0)) return true;
 				else return false;
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 			return false;
 		} else return false;
@@ -73,7 +75,7 @@ public class SpeakingTracker {
 		try{
 			setSpeackingAsTrue=DialogueOperatorEffect.createAssignment(NLBusBase.systemSpeakingStateVarName, true);
 			setSpeackingAsFalse=DialogueOperatorEffect.createAssignment(NLBusBase.systemSpeakingStateVarName, false);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 	}
 	public void setSpeaking(NLGEvent ev) throws Exception {
 		speakingThis=ev;
@@ -208,7 +210,7 @@ public class SpeakingTracker {
 			is.setValueOfVariable(NLBusBase.systemSpeakingCompletionVarName, 1f,ACCESSTYPE.AUTO_OVERWRITEAUTO);
 			is.store(setSpeackingAsFalse, ACCESSTYPE.AUTO_OVERWRITEAUTO,true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 

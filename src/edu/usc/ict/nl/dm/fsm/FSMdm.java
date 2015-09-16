@@ -58,7 +58,7 @@ public class FSMdm extends SCXMLRunner {
 				try {
 					updateInformationStateWithEvent(ev);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 			else if (ev instanceof Event) {
 				NLUOutput internalEvent=(NLUOutput) ev.getPayload();
@@ -111,7 +111,7 @@ public class FSMdm extends SCXMLRunner {
 		try {
 			return parseSCXMLFile(policyURL);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}

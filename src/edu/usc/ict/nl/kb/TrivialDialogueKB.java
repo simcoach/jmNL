@@ -688,8 +688,9 @@ public class TrivialDialogueKB extends DialogueKB {
 				}
 			}
 			if (getParent()!=null) getParent().printKB(indent+" ");
-		} catch (Exception e) {e.printStackTrace();}
-		
+		} catch (Exception e) {
+			logger.error(Sanitizer.log(e.getMessage()), e);
+		}
 	}
 
 	@Override
@@ -744,7 +745,7 @@ public class TrivialDialogueKB extends DialogueKB {
 		try {
 			setValueOfVariable(vName, value,ACCESSTYPE.AUTO_OVERWRITEAUTO);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 

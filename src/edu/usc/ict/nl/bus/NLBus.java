@@ -309,7 +309,7 @@ public class NLBus extends NLBusBase {
 			try {
 				nl.startup();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 	}
 	public void shutdown() throws Exception {
@@ -337,7 +337,7 @@ public class NLBus extends NLBusBase {
 		try {
 			nl.shutdown();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	/** JSVC Daemon destroy method. Release all objects created in init() */

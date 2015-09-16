@@ -9,14 +9,19 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.bus.modules.DM;
 import edu.usc.ict.nl.dm.reward.possibilityGraph.PossibleIS;
 import edu.usc.ict.nl.dm.reward.possibilityGraph.PossibleTransition;
 import edu.usc.ict.nl.dm.visualizer.kbDisplay.Variable;
 import edu.usc.ict.nl.kb.DialogueKBInterface;
 import edu.usc.ict.nl.kb.InformationStateInterface.ACCESSTYPE;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class BaseDMVisualizer extends JPanel implements WindowListener, DMVisualizerI {
+	
+    static final Logger logger = Logger.getLogger(BaseDMVisualizer.class);
 
 	protected JFrame frame=null;
 	protected VisualizerConfig config; 
@@ -45,7 +50,7 @@ public class BaseDMVisualizer extends JPanel implements WindowListener, DMVisual
 					}
 				}
 			}
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 	}
 
 	@Override

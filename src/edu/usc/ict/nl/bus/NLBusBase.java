@@ -198,7 +198,7 @@ public abstract class NLBusBase implements NLBusInterface {
 	
 	public synchronized void setDialogSession2User(Long sessionID,String user) {
 		if (!existDialogSession(sessionID)) {
-			logger.warn(" session "+sessionID+" set to user "+session2User.get(sessionID)+" and now being switched to user "+user);
+			logger.warn(Sanitizer.log(" session "+sessionID+" set to user "+session2User.get(sessionID)+" and now being switched to user "+user));
 		}
 		session2User.put(sessionID, user);
 	}
@@ -238,7 +238,9 @@ public abstract class NLBusBase implements NLBusInterface {
 		getSpecialVariables(characterName, true);
 		try {
 			getPolicyDMForSession(sid,true);
-		} catch (Exception e) {logger.error("Error when creating dm while starting session "+sid+" for character "+characterName+".",e);}
+		} catch (Exception e) {
+			logger.error(Sanitizer.log("Error when creating dm while starting session "+sid+" for character "+characterName+"."),e);
+		}
 		if (hasListeners()) {
 			for(ExternalListenerInterface l:getListeners()) {
 				l.startSession(characterName,sid);
@@ -295,13 +297,13 @@ public abstract class NLBusBase implements NLBusInterface {
 			try {
 				dm=getPolicyDMForSession(sessionId);
 			} catch (Exception e) {
-				logger.warn("no dm available for session: "+sessionId+"  (probably it's already been terminated).");
+				logger.warn(Sanitizer.log("no dm available for session: "+sessionId+"  (probably it's already been terminated)."));
 			}
 			if (dm!=null && !dm.isSessionDone()) dm.kill();
 			try {
 				killNlu(sessionId);
 			} catch (Exception e) {
-				logger.warn("exception killing NLU for: "+sessionId+"  (probably it's already been terminated).");
+				logger.warn(Sanitizer.log("exception killing NLU for: "+sessionId+"  (probably it's already been terminated)."));
 			}
 			session2User.remove(sessionId);
 			session2Character.remove(sessionId);
@@ -312,7 +314,7 @@ public abstract class NLBusBase implements NLBusInterface {
 			if (handledEvents != null)
 				handledEvents.clear();
 			session2HandledEvents.remove(sessionId);
-			logger.info("REMOVED terminated session: "+sessionId);
+			logger.info(Sanitizer.log("REMOVED terminated session: "+sessionId));
 			if (hasListeners()) {
 				for(ExternalListenerInterface l:getListeners()) {
 					l.terminateSession(sessionId);
@@ -334,7 +336,7 @@ public abstract class NLBusBase implements NLBusInterface {
 	// library functions to find/compile/validate a dialog policy
 	//##############################################################################
 	public HashMap<String, String> findAvailablePolicies(String basePoliciesURL) throws Exception {
-		logger.info("DIALOGUE POLICIES DIR: " + basePoliciesURL.toString());
+		logger.info(Sanitizer.log("DIALOGUE POLICIES DIR: " + basePoliciesURL.toString()));
 		URL policiesDirURL;
 		policiesDirURL = ClassLoader.getSystemResource(basePoliciesURL);
 		if (policiesDirURL == null)
@@ -359,11 +361,11 @@ public abstract class NLBusBase implements NLBusInterface {
 				String name=config.getInitialPolicyFileName();
 				File fileForName=new File(name);
 				if (doesCharacterExist(config, characterName)) {
-					logger.info("Adding POLICY network for characher '"+characterName+"'");
+					logger.info(Sanitizer.log("Adding POLICY network for characher '"+characterName+"'"));
 					character2unparsedPolicy.put(characterName, name);
 				} else {
-					logger.warn("Failed to add POLICY for character '"+characterName+"' because initial file not found and/or character not found.");
-					logger.warn("initial policy file: '"+new File(config.getInitialPolicyFileName()).getAbsolutePath()+"'");
+					logger.warn(Sanitizer.log("Failed to add POLICY for character '"+characterName+"' because initial file not found and/or character not found."));
+					logger.warn(Sanitizer.log("initial policy file: '"+new File(config.getInitialPolicyFileName()).getAbsolutePath()+"'"));
 				}
 			}
 		} else throw new Exception("Error: POLICY root must be a directory.");
@@ -387,7 +389,7 @@ public abstract class NLBusBase implements NLBusInterface {
 				Object parsedDialoguePolicy=getDM().parseDialoguePolicy(policyURL);
 				character2parsedPolicy.put(characterName, parsedDialoguePolicy);
 			} catch (Exception e) {
-				logger.error("Error while parsing policy for character: "+characterName,e);
+				logger.error(Sanitizer.log("Error while parsing policy for character: "+characterName),e);
 				logger.error("REMOVING policy.");
 				if (toBeRemoved==null) toBeRemoved=new HashSet<String>();
 				toBeRemoved.add(characterName);
@@ -682,7 +684,7 @@ public abstract class NLBusBase implements NLBusInterface {
 							}
 						}
 					} catch (Exception e) {
-						logger.error("Error while adding special variable from Protocol: "+p, e);
+						logger.error(Sanitizer.log("Error while adding special variable from Protocol: "+p), e);
 					}
 				}
 			}

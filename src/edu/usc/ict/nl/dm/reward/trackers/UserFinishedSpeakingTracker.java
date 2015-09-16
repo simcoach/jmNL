@@ -2,15 +2,13 @@ package edu.usc.ict.nl.dm.reward.trackers;
 
 import org.apache.log4j.Logger;
 
-import edu.usc.ict.nl.bus.NLBus;
 import edu.usc.ict.nl.bus.NLBusBase;
-import edu.usc.ict.nl.bus.modules.DM;
-import edu.usc.ict.nl.bus.special_variables.SpecialVar;
 import edu.usc.ict.nl.dm.reward.RewardDM;
 import edu.usc.ict.nl.dm.reward.model.DialogueOperatorEffect;
 import edu.usc.ict.nl.kb.DialogueKB;
 import edu.usc.ict.nl.kb.DialogueKBFormula;
 import edu.usc.ict.nl.kb.InformationStateInterface.ACCESSTYPE;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 
 public class UserFinishedSpeakingTracker extends ValueTracker {
@@ -26,7 +24,7 @@ public class UserFinishedSpeakingTracker extends ValueTracker {
 		try {
 			userSpeaking = (Boolean) is.evaluate(is.getValueOfVariable(NLBusBase.userSpeakingStateVarName,ACCESSTYPE.AUTO_OVERWRITEAUTO,null),null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			dm.getLogger().error(Sanitizer.log(e.getMessage()), e);
 		}
 		boolean ret=userSpeaking==null || !userSpeaking;
 		//call the setter to make sure that other methods depending on the set values are in sinck with the result provided by this getter call.
@@ -48,7 +46,7 @@ public class UserFinishedSpeakingTracker extends ValueTracker {
 				float time = dm.getMessageBus().getTimeUserHasBeenSpeaking();
 				if (time>0) is.setValueOfVariable(NLBusBase.lengthOfLastThingUserSaidVarName,time,ACCESSTYPE.AUTO_OVERWRITEAUTO);
 			} catch (Exception e) {
-				e.printStackTrace();
+				dm.getLogger().error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 	}

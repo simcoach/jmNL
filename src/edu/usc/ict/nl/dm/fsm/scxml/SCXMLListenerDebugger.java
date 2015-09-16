@@ -12,8 +12,13 @@ import org.apache.commons.scxml.SCXMLListener;
 import org.apache.commons.scxml.TriggerEvent;
 import org.apache.commons.scxml.model.Transition;
 import org.apache.commons.scxml.model.TransitionTarget;
+import org.apache.log4j.Logger;
+
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SCXMLListenerDebugger extends Thread implements SCXMLListener {
+	
+	protected static final Logger logger = Logger.getLogger(SCXMLListenerDebugger.class);
 
 	private static final long serialVersionUID = 1L;
 	HashMap<TransitionTarget,HashSet<Transition>> activeTransitions=new HashMap<TransitionTarget, HashSet<Transition>>();
@@ -44,7 +49,7 @@ public class SCXMLListenerDebugger extends Thread implements SCXMLListener {
     				out.println(event);
     			}
     		} catch (InterruptedException e) {
-    			e.printStackTrace();
+    			logger.error(Sanitizer.log(e.getMessage()), e);
     		}
     	}
     }
@@ -80,7 +85,7 @@ public class SCXMLListenerDebugger extends Thread implements SCXMLListener {
 		try {
 			sendActiveState(state);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -89,7 +94,7 @@ public class SCXMLListenerDebugger extends Thread implements SCXMLListener {
 		try {
 			sendInactiveState(state);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -100,7 +105,7 @@ public class SCXMLListenerDebugger extends Thread implements SCXMLListener {
 		try {
 			sendActiveTransition(from,to,tr);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		if (!activeTransitions.containsKey(to)) {
 			HashSet<Transition> set = new HashSet<Transition>();

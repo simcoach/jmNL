@@ -18,6 +18,7 @@ import edu.usc.ict.nl.kb.DialogueKB;
 import edu.usc.ict.nl.kb.EvalContext;
 import edu.usc.ict.nl.kb.InformationStateInterface.ACCESSTYPE;
 import edu.usc.ict.nl.kb.TrivialDialogueKB;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class TestRewardDM extends RewardDM {
 
@@ -42,7 +43,7 @@ public class TestRewardDM extends RewardDM {
 		try {
 			getRootInformationState().setValueOfVariable(NLBusBase.dmVariableName, this,ACCESSTYPE.AUTO_OVERWRITEAUTO);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	

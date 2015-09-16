@@ -1414,7 +1414,6 @@ public class ICTKStemmer {
 
 	} catch (Exception e) {
 	    System.out.println("Exception while processing term ["+line+"]");
-	    e.printStackTrace();
 	}
     }
 

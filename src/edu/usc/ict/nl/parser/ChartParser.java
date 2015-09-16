@@ -10,9 +10,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.parser.semantics.ParserSemanticRulesTimeAndNumbers;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class ChartParser {
+	
+	private static final Logger logger = Logger.getLogger(ChartParser.class);
 
 	// class for chart and agenda items
 	public class Item {
@@ -249,9 +254,9 @@ public class ChartParser {
 			try {
 				return r.sem.apply(semantics);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 				if (e instanceof InvocationTargetException)
-					System.out.println(e.getCause());
+					logger.error(Sanitizer.log(e.getCause()));
 				return null;
 			}
 			else return null;

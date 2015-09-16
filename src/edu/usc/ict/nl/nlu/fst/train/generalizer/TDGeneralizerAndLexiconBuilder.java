@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.bus.modules.NLU;
 import edu.usc.ict.nl.config.NLBusConfig;
 import edu.usc.ict.nl.config.NLUConfig;
@@ -20,8 +22,11 @@ import edu.usc.ict.nl.nlu.fst.train.AlignmentSummary;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.ExcelUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class TDGeneralizerAndLexiconBuilder {
+	
+    static final Logger logger = Logger.getLogger(TDGeneralizerAndLexiconBuilder.class);
 
 	List<Pattern> patterns=null; 
 	/**
@@ -114,7 +119,7 @@ public class TDGeneralizerAndLexiconBuilder {
 					itds.addAll(tds);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 		return itds;

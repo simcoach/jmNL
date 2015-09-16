@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.dialogue.McNLU;
 import edu.usc.ict.dialogue.ScoredFrame;
 import edu.usc.ict.nl.nlu.mxnlu.MXClassifierProcess;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 import edu.usc.ict.nlp.ml.Multitron;
 
 public class JMXClassifierProcess extends MXClassifierProcess {
+	
+    static final Logger logger = Logger.getLogger(JMXClassifierProcess.class);
 
 	private McNLU classifier;
 	
@@ -135,7 +140,7 @@ public class JMXClassifierProcess extends MXClassifierProcess {
 			String[] r = p.classify("yes");
 			System.out.println(Arrays.asList(r));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 

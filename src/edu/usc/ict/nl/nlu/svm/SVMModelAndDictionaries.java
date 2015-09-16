@@ -20,6 +20,8 @@ import libsvm.svm_node;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
 
+import org.apache.log4j.Logger;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
@@ -28,6 +30,9 @@ import edu.usc.ict.nl.nlu.trainingFileReaders.MXNLUTrainingFile;
 import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SVMModelAndDictionaries {
+	
+    static final Logger logger = Logger.getLogger(SVMModelAndDictionaries.class);
+	
 	private Map<String,Integer> outputClassDictionary=null;
 	private Map<Integer,String> outputClassDictionaryInverse=null;
 	private Map<String,Integer> featuresDictionary=null;
@@ -94,7 +99,7 @@ public class SVMModelAndDictionaries {
 			return null;
 		} catch (Exception e) {
 			System.err.println("Error loading model: "+serializedFile);
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 
 		return classifier;

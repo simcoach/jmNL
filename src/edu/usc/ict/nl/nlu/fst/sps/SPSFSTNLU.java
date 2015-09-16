@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import edu.usc.ict.nl.bus.NLBus;
 import edu.usc.ict.nl.bus.modules.NLU;
 import edu.usc.ict.nl.config.NLBusConfig;
 import edu.usc.ict.nl.config.NLUConfig;
@@ -14,6 +13,7 @@ import edu.usc.ict.nl.nlu.TrainingDataFormat;
 import edu.usc.ict.nl.nlu.fst.FSTNLU;
 import edu.usc.ict.nl.nlu.fst.FSTNLUOutput;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SPSFSTNLU extends FSTNLU {
 	private SAMapper mapper=null;
@@ -44,7 +44,7 @@ public class SPSFSTNLU extends FSTNLU {
 				mapper=new SAMapper(c);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 

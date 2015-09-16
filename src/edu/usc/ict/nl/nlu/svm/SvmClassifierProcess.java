@@ -7,14 +7,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import libsvm.svm;
 import libsvm.svm_model;
 import libsvm.svm_node;
 import edu.usc.ict.nl.nlu.mxnlu.MXClassifierProcess;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SvmClassifierProcess extends MXClassifierProcess {
-
+	
+    static final Logger logger = Logger.getLogger(SvmClassifierProcess.class);
 
 	private SVMModelAndDictionaries classifier=null;
 	private LibSVMNLU nlu=null;
@@ -22,7 +26,6 @@ public class SvmClassifierProcess extends MXClassifierProcess {
 	public SvmClassifierProcess(LibSVMNLU nlu) {
 		super(null, null);
 		this.nlu=nlu;
-
 	}
 
 	public SVMModelAndDictionaries getClassifier() {
@@ -43,8 +46,6 @@ public class SvmClassifierProcess extends MXClassifierProcess {
 		SVMModelAndDictionaries newclassifier=SVMModelAndDictionaries.train(nlu,trainingFile);
 		newclassifier.save(modelFile);
 	}
-	
-
 	
 	private svm_node[] getSVMTestCaseFromString(String text) throws Exception {
 		String featuresString = text;//nlu.doPreprocessingForClassify(text);
@@ -78,12 +79,12 @@ public class SvmClassifierProcess extends MXClassifierProcess {
 		try {
 			x = getSVMTestCaseFromString(u);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		if (x!=null) {
 			int c =(int) svm.svm_predict(svmm,x);
 			String outputClass=classifier.getOutputClassForId(c);
-			System.out.println(outputClass);
+			logger.info(Sanitizer.log(outputClass));
 			String[] results=new String[]{"1 "+StringUtils.removeLeadingAndTrailingSpaces(outputClass)};
 			return results;
 		}
@@ -115,7 +116,7 @@ public class SvmClassifierProcess extends MXClassifierProcess {
 			String[] r = p.classify("yes");
 			System.out.println(Arrays.asList(r));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 

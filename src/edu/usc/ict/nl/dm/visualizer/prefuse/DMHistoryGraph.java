@@ -20,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import org.apache.log4j.Logger;
+
 import prefuse.Constants;
 import prefuse.Display;
 import prefuse.Visualization;
@@ -62,6 +64,7 @@ import prefuse.visual.DecoratorItem;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 import prefuse.visual.sort.TreeDepthItemSorter;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 
 /**
@@ -71,6 +74,8 @@ import prefuse.visual.sort.TreeDepthItemSorter;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DMHistoryGraph extends Display {
+	
+    static final Logger logger = Logger.getLogger(DMHistoryGraph.class);
 
     public static final String TREE_CHI = "data/chi-ontology.xml.gz";
     
@@ -327,7 +332,7 @@ public class DMHistoryGraph extends Display {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
     		}
     	}
@@ -367,7 +372,7 @@ public class DMHistoryGraph extends Display {
         /*try {
             t = (Tree)new TreeMLReader().readGraph(datafile);
         } catch ( Exception e ) {
-            e.printStackTrace();
+            logger.error(Sanitizer.log(e.getMessage()), e);
             System.exit(1);
         }*/
         

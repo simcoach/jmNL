@@ -9,6 +9,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.bus.NLBusBase;
 import edu.usc.ict.nl.bus.events.Event;
 import edu.usc.ict.nl.bus.events.NLUEvent;
@@ -27,8 +29,11 @@ import edu.usc.ict.nl.nlu.NLUOutput;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.Triple;
 import edu.usc.ict.nl.util.graph.Edge;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class DialogueAction {
+	
+    static final Logger logger = Logger.getLogger(DialogueAction.class);
 	
 	/*
 	 *  PAUSED is when the action is waiting for a system line to complete
@@ -502,7 +507,7 @@ public class DialogueAction {
 						}
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 					return null;
 				}
 			}

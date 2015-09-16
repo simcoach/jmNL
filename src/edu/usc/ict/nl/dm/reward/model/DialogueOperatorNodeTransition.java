@@ -19,6 +19,7 @@ import edu.usc.ict.nl.kb.EvalContext;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.XMLUtils;
 import edu.usc.ict.nl.util.graph.Edge;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class DialogueOperatorNodeTransition extends Edge {
 
@@ -81,7 +82,7 @@ public class DialogueOperatorNodeTransition extends Edge {
 			Node rootNode = doc.getDocumentElement();
 			if (isTransitionNode(rootNode)) return parseTransition(rootNode, rootNode.getAttributes(), new DialogueOperatorNode(),new DialogueOperator(),tr);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}

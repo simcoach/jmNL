@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.nlu.NLUOutput;
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.Pair;
@@ -18,12 +20,12 @@ import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.Triple;
 import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.util.graph.GraphElement;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class FSTNLUOutput extends NLUOutput {
+	
+    static final Logger logger = Logger.getLogger(FSTNLUOutput.class);
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private LinkedHashMap<String, List<Triple<Integer,String,Float>>> parts=null;
@@ -264,7 +266,7 @@ public class FSTNLUOutput extends NLUOutput {
 			try {
 				return FunctionalLibrary.printCollection(parts.keySet(), "", "", " ");
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 		return null;
@@ -292,7 +294,7 @@ public class FSTNLUOutput extends NLUOutput {
 					for(Triple<Integer, String,Float> i:input) w+=i.getThird();
 					ret.append((first?"":" ")+nlu+"("+range+":"+text+"["+w+"])");
 					first=false;
-				} catch (Exception e) {e.printStackTrace();}
+				} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 			}
 			ret.append(">");
 			ret.append(getProb().getResult());

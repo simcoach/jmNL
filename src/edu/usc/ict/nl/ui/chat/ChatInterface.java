@@ -53,7 +53,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -72,6 +71,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -95,15 +95,15 @@ import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.XMLUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 import edu.usc.ict.nl.vhmsg.VHBridge;
 import edu.usc.ict.vhmsg.MessageEvent;
 import edu.usc.ict.vhmsg.MessageListener;
 
 public class ChatInterface extends JPanel implements KeyListener, WindowListener, ActionListener, ExternalListenerInterface {
-
-	/**
-	 * 
-	 */
+	
+    static final Logger logger = Logger.getLogger(ChatInterface.class);
+    
 	private static final long serialVersionUID = 1L;
 	
 	public static final long chatInterfaceSingleSessionID=999l;
@@ -251,7 +251,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 				try {
 					feedback.saveFeedback(chatLogFileName,feedback.getFormValues());
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 				displayState=MainDisplayStatus.CHAT;
 			}
@@ -474,7 +474,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 				}
 				nluOutput.setText(sb.toString());
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		} else nluOutput.setText("");
 	}
@@ -508,7 +508,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 			this.sid=sid;
 			setInterfaceForSessionRestarted(characterName);
 		} catch (Exception e) {
-			NLBus.logger.error("Error while restarting the session.",e);
+			logger.error("Error while restarting the session.",e);
 		}
 		return null;
 	}
@@ -517,7 +517,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 	@Override
 	public void terminateSession(Long sid) {
 		try {
-			if (ChatInterface.sid!=sid) NLBus.logger.warn("chat interface received a terminated session with id ("+sid+") different from chat session id: "+ChatInterface.sid);
+			if (ChatInterface.sid!=sid) logger.warn("chat interface received a terminated session with id ("+sid+") different from chat session id: "+ChatInterface.sid);
 			ChatInterface.sid=null;
 			if (input.isEnabled() && !finishedSession) {
 				disableInput("");
@@ -584,7 +584,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 						break;
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 				if (!setOfCharacters.isEmpty()) character=setOfCharacters.iterator().next();
 			}
@@ -633,7 +633,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 				throw(e);
 			}
 		} else {
-			NLBus.logger.warn("Restart session called in chat interface with empty character: '"+character+"'");
+			logger.warn(Sanitizer.log("Restart session called in chat interface with empty character: '"+character+"'"));
 		}
 	}
 
@@ -643,7 +643,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 			String vhTopic=config.getVhTopic();
 			if (vhTopic!=null) {
 				vhBridge=new VHBridge(config.getVhServer(),vhTopic, "dm", createVHDMMessageListener());
-				NLBus.logger.info("started vh message listener in "+this.getClass().getCanonicalName());
+				logger.info(Sanitizer.log("started vh message listener in "+this.getClass().getCanonicalName()));
 			}
 			nlModule.startup();
 
@@ -661,12 +661,12 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 		}
 	}
 	private void displayError(Exception e,boolean exit) {
-		e.printStackTrace();
+		logger.error(Sanitizer.log(e.getMessage()), e);
 		JOptionPane.showMessageDialog(getInstance(),
 				((e.getStackTrace()!=null)?StringUtils.getStackTrace(e):e.toString()),
 				"Error",
 				JOptionPane.ERROR_MESSAGE);
-		NLBus.logger.error("Error in chat interface.", e);
+		logger.error("Error in chat interface.", e);
 		if (exit) System.exit(1);
 	}
 
@@ -880,7 +880,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 			DialogueKBInterface is = nlg.getKBForEvent(ev);
 			return DM.isFormPreferred(ev,is);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return false;
 	}
@@ -1054,7 +1054,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -1086,7 +1086,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 				}
 			}
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -1181,7 +1181,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 					ui.startupDM();
 					ui.startDefaultCharacter();
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 			}
 		});

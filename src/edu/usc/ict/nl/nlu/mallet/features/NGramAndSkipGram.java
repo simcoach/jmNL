@@ -10,13 +10,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import cc.mallet.types.TokenSequence;
 import edu.usc.ict.nl.util.FunctionalLibrary;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class NGramAndSkipGram extends Pipe implements Serializable {
+	
+    static final Logger logger = Logger.getLogger(NGramAndSkipGram.class);
+    
 	int [] gramSizes = null;
 	public NGramAndSkipGram (int [] sizes)
 	{
@@ -41,7 +47,7 @@ public class NGramAndSkipGram extends Pipe implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		for (int i = 0; i < ts.size(); i++) {
 			Token t = ts.get(i);

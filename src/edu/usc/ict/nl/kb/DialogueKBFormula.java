@@ -47,6 +47,7 @@ import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.util.graph.Node;
 import edu.usc.ict.nl.utils.FloatAndLongUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class DialogueKBFormula extends Node {
 
@@ -95,7 +96,7 @@ public class DialogueKBFormula extends Node {
 			falseFormula=DialogueKBFormula.create("false");
 			nullFormula=DialogueKBFormula.create("null");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -384,28 +385,28 @@ public class DialogueKBFormula extends Node {
 			try {
 				return getName()+FunctionalLibrary.printCollection(getOutgoingEdges(),Edge.class.getMethod("getTarget"),"(", ")", ",");
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 			return null;
 		case NUMPRED:
 			try {
 				return getTypeOfNumericOperator()+FunctionalLibrary.printCollection(getOutgoingEdges(),Edge.class.getMethod("getTarget"),"(", ")", ",");
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 			return null;
 		case CMP:
 			try {
 				return getTypeOfCMPOperator()+FunctionalLibrary.printCollection(getOutgoingEdges(),Edge.class.getMethod("getTarget"),"(", ")", ",");
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 			return null;
 		case BOOL:
 			try {
 				return normalizePredName(getName())+FunctionalLibrary.printCollection(getOutgoingEdges(),Edge.class.getMethod("getTarget"),"(", ")", ",");
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 			return null;
 		default:

@@ -27,6 +27,7 @@ import edu.usc.ict.nl.kb.InformationStateInterface.ACCESSTYPE;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.XMLUtils;
 import edu.usc.ict.nl.util.graph.Edge;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class DialogueOperatorNode extends edu.usc.ict.nl.util.graph.Node{
 	private boolean reportStateChange=false;
@@ -104,7 +105,7 @@ public class DialogueOperatorNode extends edu.usc.ict.nl.util.graph.Node{
 			Node rootNode = doc.getDocumentElement();
 			if (isStateNode(rootNode)) return DialogueOperatorNode.parseState(rootNode, rootNode.getAttributes(), new DialogueOperator());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}

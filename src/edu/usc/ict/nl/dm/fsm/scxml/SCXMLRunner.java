@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +38,6 @@ import org.apache.log4j.PropertyConfigurator;
 import edu.usc.ict.nl.bus.NLBusBase;
 import edu.usc.ict.nl.bus.NLBusInterface;
 import edu.usc.ict.nl.bus.modules.DM;
-import edu.usc.ict.nl.bus.special_variables.SpecialVar;
 import edu.usc.ict.nl.config.NLBusConfig;
 import edu.usc.ict.nl.dm.fsm.advicer.SCXMLAdvice;
 import edu.usc.ict.nl.kb.DialogueKB;
@@ -48,8 +46,10 @@ import edu.usc.ict.nl.util.FileUtils;
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SCXMLRunner extends DM {
+	
 	protected boolean stopInfiniteLoopForTimer=false;
 	protected SCXMLExecutor exec;
 	protected SCXML scxml;
@@ -138,7 +138,7 @@ public class SCXMLRunner extends DM {
 			else
 				return SCXMLParser.parse(scxmlFile, new SimpleErrorHandler(),customActions);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}
@@ -153,7 +153,7 @@ public class SCXMLRunner extends DM {
 				out.writeObject(exec);
 				out.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 	}
@@ -174,7 +174,7 @@ public class SCXMLRunner extends DM {
 				in.close();
 				if (timerEventThread!=null) timerEventThread.start();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 	}
@@ -188,7 +188,7 @@ public class SCXMLRunner extends DM {
 			if (initialContext==null) initialContext=new JexlContext();
 			exec.setRootContext(initialContext);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return exec;
 	}
@@ -198,7 +198,7 @@ public class SCXMLRunner extends DM {
 			exec.go();
 			if (timerEventThread!=null) timerEventThread.start();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -207,7 +207,7 @@ public class SCXMLRunner extends DM {
 		try {
 			exec.triggerEvent(event);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -459,7 +459,6 @@ public class SCXMLRunner extends DM {
 			*/
 			//System.out.println("");
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

@@ -1,17 +1,11 @@
 package edu.usc.ict.nl.nlu.topic;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import edu.usc.ict.nl.bus.modules.NLU;
 import edu.usc.ict.nl.config.NLUConfig;
@@ -19,13 +13,11 @@ import edu.usc.ict.nl.kb.DialogueKBFormula;
 import edu.usc.ict.nl.nlu.BuildTrainingData;
 import edu.usc.ict.nl.nlu.NLUOutput;
 import edu.usc.ict.nl.nlu.Token;
-import edu.usc.ict.nl.nlu.Token.TokenTypes;
 import edu.usc.ict.nl.nlu.TrainingDataFormat;
 import edu.usc.ict.nl.nlu.keyword.KeywordREMatcher;
 import edu.usc.ict.nl.nlu.keyword.KeywordREMatcher.TopicMatcherRE;
 import edu.usc.ict.nl.nlu.mxnlu.MXClassifierNLU;
 import edu.usc.ict.nl.util.FunctionalLibrary;
-import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
 
@@ -35,10 +27,8 @@ public class WordlistTopicDetectionRE extends NLU {
 	
 	public WordlistTopicDetectionRE(NLUConfig c) throws Exception {
 		super(c);
-		
 		String nluModel=c.getNluModelFile();
 		loadModel(new File(nluModel));
-		
 	}
 	
 	@Override

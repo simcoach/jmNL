@@ -11,7 +11,6 @@ import java.util.Set;
 
 import edu.usc.ict.nl.bus.NLBus;
 import edu.usc.ict.nl.bus.modules.NLU;
-import edu.usc.ict.nl.config.NLConfig;
 import edu.usc.ict.nl.config.NLUConfig;
 import edu.usc.ict.nl.nlu.BuildTrainingData;
 import edu.usc.ict.nl.nlu.ChartNLUOutput;
@@ -21,6 +20,7 @@ import edu.usc.ict.nl.nlu.multi.merger.Merger;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.graph.Node;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class MultiNLU extends NLU {
 
@@ -224,7 +224,7 @@ public class MultiNLU extends NLU {
 		try {
 			getNameMethod=Node.class.getMethod("getName");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	

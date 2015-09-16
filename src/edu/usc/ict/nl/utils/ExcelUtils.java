@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -36,6 +37,9 @@ import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
 
 public class ExcelUtils {
+	
+    static final Logger logger = Logger.getLogger(ExcelUtils.class);
+    
 	public static Set<String> extractUniqueValuesInThisColumn(String file,int skip,int column) {
 		Set<String> ret=new LinkedHashSet<String>();
 		Workbook wb=getWorkbook(file);
@@ -262,7 +266,7 @@ public class ExcelUtils {
 		try {
 			return WorkbookFactory.create(new FileInputStream(file));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;		
 	}
@@ -270,7 +274,7 @@ public class ExcelUtils {
 		try {
 			return (wb!=null)?wb.getSheetAt(sheetIndex):null;			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}
@@ -279,7 +283,7 @@ public class ExcelUtils {
 			Workbook wb = WorkbookFactory.create(new FileInputStream(file));
 			return wb.getSheetAt(sheetIndex);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}

@@ -12,11 +12,17 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 
 public class ObjectKB {
+	
+    static final Logger logger = Logger.getLogger(ObjectKB.class);
+    
 	private Map<COLOR,Set<DCObject>> color2Objects=null;
 	private Map<SIZE,Set<DCObject>> size2Objects=null;
 	private Map<SHAPE,Set<DCObject>> shape2Objects=null;
@@ -33,7 +39,7 @@ public class ObjectKB {
 			getColor=DCObject.class.getMethod("getColor");
 			getShape=DCObject.class.getMethod("getShape");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	

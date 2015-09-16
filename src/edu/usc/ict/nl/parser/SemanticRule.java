@@ -5,10 +5,15 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SemanticRule {
+	
+	private static final Logger logger = Logger.getLogger(SemanticRule.class);
 
 	private String rule;
 	private Pair<Method,Object> method;
@@ -38,7 +43,10 @@ public class SemanticRule {
 						try {
 							method=new Pair<Method, Object>(semanticRulesContainer.getClass().getDeclaredMethod("nothing",new Class[]{Object[].class}),semanticRulesContainer);
 							arguments=new Object[]{pos};
-						} catch (Exception e) {e.printStackTrace(); throw new Exception();}
+						} catch (Exception e) {
+							logger.error(Sanitizer.log(e.getMessage()), e); 
+							throw new Exception();
+						}
 					}
 				} catch (NumberFormatException e) {
 					method=new Pair<Method, Object>(semanticRulesContainer.getClass().getMethod(part,new Class[]{Object[].class}),semanticRulesContainer);

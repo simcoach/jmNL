@@ -18,6 +18,7 @@ import edu.usc.ict.nl.bus.modules.NLGInterface;
 import edu.usc.ict.nl.config.NLBusConfig;
 import edu.usc.ict.nl.nlu.NLUOutput;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 import edu.usc.ict.nl.vhmsg.VHBridge;
 import edu.usc.ict.nl.vhmsg.VHBridge.VRGenerate;
 import edu.usc.ict.nl.vhmsg.VHBridge.VRNLU;
@@ -278,9 +279,9 @@ public class VHProtocol extends Protocol {
 	}
 	protected MessageListener createVrLauncherMessagesListener() {
 		return new MessageListener() {
-			public void messageAction(MessageEvent e) {
+			public void messageAction(MessageEvent event) {
 				String componentName=config.getVhComponentId();
-				Map<String, ?> map = e.getMap();
+				Map<String, ?> map = event.getMap();
 				if (map.containsKey("vrAllCall")) {
 					vhBridge.sendComponetIsAlive(componentName);
 				} else if (map.containsKey("vrKillComponent")) {
@@ -289,8 +290,8 @@ public class VHProtocol extends Protocol {
 						vhBridge.sendComponentKilled(componentName);
 						try {
 							bus.shutdown();
-						} catch (Exception e1) {
-							e1.printStackTrace();
+						} catch (Exception e) {
+							logger.error(Sanitizer.log(e.getMessage()), e);
 						}
 						System.exit(0);
 					}

@@ -10,8 +10,11 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.parser.ChartParser.Item;
 import edu.usc.ict.nl.parser.GrammarRule.GrammarRuleType;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 /**
  * Simple grammar class, used by chartParser in the NLU
@@ -19,6 +22,8 @@ import edu.usc.ict.nl.parser.GrammarRule.GrammarRuleType;
  *
  */
 public class Grammar {
+	
+	private static final Logger logger = Logger.getLogger(Grammar.class);
 	// Simple class for grammar rules
 
 	GrammarRule[] rules;		// the rules
@@ -85,7 +90,9 @@ public class Grammar {
 				if (rule.getType().equals(GrammarRuleType.RE)) {
 					try {
 						terminalRE.put(Pattern.compile(rule.rhs[0]), nrules);
-					} catch(Exception e) {e.printStackTrace();}
+					} catch(Exception e) {
+						logger.error(Sanitizer.log(e.getMessage()), e);
+					}
 				}
 				
 				// adds the rule number to the hashmaps.

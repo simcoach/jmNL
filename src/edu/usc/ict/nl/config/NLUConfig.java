@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.nlu.multi.merger.Merger;
 import edu.usc.ict.nl.nlu.ne.NamedEntityExtractorI;
 import edu.usc.ict.nl.nlu.trainingFileReaders.NLUTrainingFileI;
@@ -17,6 +19,8 @@ import edu.usc.ict.nl.utils.FileUtil;
 import edu.usc.ict.nl.utils.Sanitizer;
 
 public class NLUConfig extends NLConfig {
+	
+    static final Logger logger = Logger.getLogger(NLUConfig.class);
 	
 	private String nluExeRoot="mxnlu"; //base file directory where nlu exe can be found if applicable. default set for legacy support
 	private Map<String,String> nluExeEnv = new HashMap<String, String>(); // environment variables for the nlu process
@@ -82,7 +86,7 @@ public class NLUConfig extends NLConfig {
 					}
 				}
 			}
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 		return ret;
 	}
 	

@@ -9,11 +9,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.config.NLConfig.ExecutablePlatform;
 import edu.usc.ict.nl.config.NLUConfig;
 
 
 public class SpellCheckProcess {
+	
+    static final Logger logger = Logger.getLogger(SpellCheckProcess.class);
+    
 	private NLUConfig configuration;
 	private Process p=null;
 	private ProcessBuilder pb;
@@ -140,7 +145,7 @@ public class SpellCheckProcess {
 			SpellCheckProcess sc = new SpellCheckProcess(NLUConfig.WIN_EXE_CONFIG);
 			System.out.println(sc.sendWordGetFirstChoice("nighmares"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}	
 }

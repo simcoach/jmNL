@@ -2,7 +2,6 @@ package edu.usc.ict.nl.nlu.opennlp;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,20 +11,23 @@ import opennlp.maxent.BasicEventStream;
 import opennlp.maxent.DoubleStringPair;
 import opennlp.maxent.GIS;
 import opennlp.maxent.ModelTrainer;
-import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
-import opennlp.maxent.quasinewton.QNTrainer;
 import opennlp.model.AbstractModel;
 import opennlp.model.AbstractModelWriter;
-import opennlp.model.Event;
 import opennlp.model.EventStream;
 import opennlp.model.GenericModelReader;
 import opennlp.model.MaxentModel;
 import opennlp.model.OnePassDataIndexer;
+
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.nlu.mxnlu.MXClassifierProcess;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class MaxEntOpenNLPClassifierProcess extends MXClassifierProcess {
+	
+    private static final Logger logger = Logger.getLogger(MaxEntOpenNLPClassifierProcess.class);
 
 	private MaxentModel classifier;
     int maxit = 100;
@@ -51,15 +53,14 @@ public class MaxEntOpenNLPClassifierProcess extends MXClassifierProcess {
 
 	public MaxentModel loadClassifier(File serializedFile) {
 		MaxentModel classifier=null;
-
 		try {
 			classifier = (MaxentModel)new GenericModelReader(serializedFile).getModel();
 		} catch (FileNotFoundException e) {
-			System.err.println("Classifier model file does not exist: "+serializedFile);
+			logger.error(Sanitizer.log("Classifier model file does not exist: "+serializedFile));
 			return null;
 		} catch (Exception e) {
-			System.err.println("Error loading model: "+serializedFile);
-			e.printStackTrace();
+			logger.error(Sanitizer.log("Error loading model: "+serializedFile));
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 
 		return classifier;
@@ -140,7 +141,7 @@ public class MaxEntOpenNLPClassifierProcess extends MXClassifierProcess {
 			String[] r = p.classify("yes");
 			System.out.println(Arrays.asList(r));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 

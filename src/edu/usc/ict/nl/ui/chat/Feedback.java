@@ -25,12 +25,17 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.PlainDocument;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.config.NLBusConfig;
 import edu.usc.ict.nl.util.FileUtils;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class Feedback {
+	
+    static final Logger logger = Logger.getLogger(Feedback.class);
 	
 	private JEditorPane editorPane;
 	private Set<String> feedbackQuestions=null;
@@ -115,7 +120,7 @@ public class Feedback {
 						value = d.getText(0, d.getLength());
 						ret.put(group, new Pair<String, String>(value, questions.get(group)));
 					} catch (BadLocationException e) {
-						e.printStackTrace();
+						logger.error(Sanitizer.log(e.getMessage()), e);
 					}
 				}
 			} else {
@@ -281,7 +286,7 @@ public class Feedback {
 					Map<String, Pair<String, String>> results = getResultsFromSavedFile(file.getAbsolutePath());
 					tot=aggregateResponses(tot, results);
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 			}
 		}

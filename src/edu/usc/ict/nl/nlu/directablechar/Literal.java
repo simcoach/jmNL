@@ -6,10 +6,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class Literal {
+	
+    static final Logger logger = Logger.getLogger(Literal.class);
+    
 	public static final Pattern pp=Pattern.compile("^[\\s]*(([^(-]+)(-[^\\(]*)?)\\((.*)\\)[\\s]*$");
 	private String p,justP;
 	private List<String> args;
@@ -45,7 +51,7 @@ public class Literal {
 		try {
 			argss = (args!=null && !args.isEmpty())?FunctionalLibrary.printCollection(args, "", "", ","):"";
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return p+"("+argss+((w!=null)?" :"+w:"")+")";
 	}
@@ -67,7 +73,7 @@ public class Literal {
 		try {
 			argss = (args!=null && !args.isEmpty())?FunctionalLibrary.printCollection(args, "", "", " "):"";
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return "("+p+" "+argss+((w!=null)?" :"+w:"")+")";
 	}

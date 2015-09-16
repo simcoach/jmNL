@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.bus.events.Event;
 import edu.usc.ict.nl.bus.modules.DM;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class TimerThread extends Thread {
+	
+    static final Logger logger = Logger.getLogger(TimerThread.class);
 	
 	public class TimerTask {
 		long intervalInMilliseconds;
@@ -122,8 +127,8 @@ public class TimerThread extends Thread {
 				}
 				Thread.sleep(100);
 			}
-		} catch (Exception t) {
-			t.printStackTrace();
+		} catch (Exception e) {
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		dm.getLogger().warn("Terminated timer thread: "+getName());
 	}

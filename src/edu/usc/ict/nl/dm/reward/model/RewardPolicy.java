@@ -57,6 +57,7 @@ import edu.usc.ict.nl.util.XMLUtils;
 import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.util.graph.GraphElement;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 // a list of dialogue operators
 public class RewardPolicy {
@@ -235,7 +236,7 @@ public class RewardPolicy {
 							if (persistent!=null) eff.setAssignmentProperty(PROPERTY.PERSISTENT, persistent);
 							if (readOnly!=null) eff.setAssignmentProperty(PROPERTY.READONLY, readOnly);
 						}
-					} catch (Exception e) {e.printStackTrace();}
+					} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 					if (eff!=null) {
 						if (initIS==null) initIS=new ArrayList<DialogueOperatorEffect>();
 						initIS.add(eff);
@@ -1181,7 +1182,7 @@ public class RewardPolicy {
 			}
 			out.write("}\n");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	public void toGDLGraphs(String baseFileName) {
@@ -1196,7 +1197,7 @@ public class RewardPolicy {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	
@@ -1296,7 +1297,7 @@ public class RewardPolicy {
 			//dp.toGDLGraph("policy.gdl");
 			 */
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 }

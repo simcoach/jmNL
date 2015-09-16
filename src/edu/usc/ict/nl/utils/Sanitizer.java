@@ -18,6 +18,10 @@ public final class Sanitizer {
 		return s;
 	}
 	
+	public static String log(Object s) {
+		return (s == null) ? null : s.toString();
+	}
+	
 	public static String file(String s) {
 		return s;
 	}

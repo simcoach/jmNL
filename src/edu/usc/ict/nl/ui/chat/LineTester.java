@@ -24,12 +24,18 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.bus.NLBus;
 import edu.usc.ict.nl.bus.events.DMSpeakEvent;
 import edu.usc.ict.nl.bus.events.NLGEvent;
 import edu.usc.ict.nl.bus.modules.NLGInterface;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class LineTester extends JPanel implements ListSelectionListener {
+	
+    static final Logger logger = Logger.getLogger(LineTester.class);
+    
 	private JList list;
 	private DefaultListModel listModel;
 	private JLabel extraInfoLabel=null;
@@ -152,7 +158,7 @@ public class LineTester extends JPanel implements ListSelectionListener {
 					//Display the window.
 					frame.pack();
 					frame.setVisible(true);
-				} catch (Exception e) {e.printStackTrace();}
+				} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 			}
 		});
 	}

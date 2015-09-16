@@ -27,6 +27,7 @@ import edu.usc.ict.nl.util.AhoCorasickList.MatchList;
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class WordlistTopicDetection extends NLU {
 
@@ -34,10 +35,8 @@ public class WordlistTopicDetection extends NLU {
 
 	public WordlistTopicDetection(NLUConfig c) throws Exception {
 		super(c);
-		
 		String nluModel=c.getNluModelFile();
 		loadModel(new File(nluModel));
-		
 	}
 	
 	private static final Pattern hierModelLine=Pattern.compile("^([^\\s]+)[\\s]+(.+)$");
@@ -81,7 +80,7 @@ public class WordlistTopicDetection extends NLU {
 					m.addPattern(ts, topicID);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 	}

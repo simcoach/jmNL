@@ -20,6 +20,7 @@ import edu.usc.ict.nl.config.NLUConfig;
 import edu.usc.ict.nl.nlu.trainingFileReaders.MXNLUTrainingFile;
 import edu.usc.ict.nl.nlu.trainingFileReaders.NLUTrainingFileI;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 import edu.usc.ict.nl.vhmsg.VHBridge;
 import edu.usc.ict.vhmsg.MessageEvent;
 import edu.usc.ict.vhmsg.MessageListener;
@@ -101,7 +102,7 @@ public class NLUExe extends NLU {
 				}
 			}
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 			printUsageHelp();
 			throw e;
 		}
@@ -110,12 +111,12 @@ public class NLUExe extends NLU {
 	private static MessageListener createVrSpeechMessageListener() {
 		return new MessageListener() {
 
-			public void messageAction(MessageEvent e)
+			public void messageAction(MessageEvent event)
 			{
 				VHBridge.VRSpeech msg=null;
 				try {
 					// this will fire an exception if the input message is not a vrExpress message. 
-					msg=vhBridge.processVrSpeechEvent(e);
+					msg=vhBridge.processVrSpeechEvent(event);
 				} catch (Exception ex){
 					//System.out.println("MessageListener.messageAction received non vrExpress message.");
 				}
@@ -125,8 +126,8 @@ public class NLUExe extends NLU {
 						try {
 							List<NLUOutput> result = nlu.getNLUOutput(msg.getUtterance(), null, nBest);
 							sendResult(result);
-						} catch (Exception e1) {
-							e1.printStackTrace();
+						} catch (Exception e) {
+							logger.error(Sanitizer.log(e.getMessage()), e);
 						}
 					}
 				}
@@ -138,7 +139,7 @@ public class NLUExe extends NLU {
 		if (result!=null) {
 			for(NLUOutput r:result) {
 				if (vhBridge!=null) vhBridge.sendVRNLU(r.getId(), "test", vhMessagesSentCounter++);
-				System.out.println(r);
+				logger.info(Sanitizer.log(r));
 			}
 		}
 	}
@@ -171,7 +172,7 @@ public class NLUExe extends NLU {
 							List<NLUOutput> result = nlu.getNLUOutput(line, null, nBest);
 							sendResult(result);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error(Sanitizer.log(e.getMessage()), e);
 						}
 					}
 				}
@@ -181,8 +182,8 @@ public class NLUExe extends NLU {
 		case TRAIN:
 			File inputFile=new File(config.getNluTrainingFile());
 			List<TrainingDataFormat> tds = reader.getTrainingInstances(inputFile);
-			logger.info("starting training with data from: "+inputFile);
-			if (tds!=null) logger.info("lines: "+tds.size());
+			logger.info(Sanitizer.log("starting training with data from: "+inputFile));
+			if (tds!=null) logger.info(Sanitizer.log("lines: "+tds.size()));
 			else logger.info("null data.");
 			nlu.train(tds, new File(config.getNluModelFile()));
 			nlu.kill();

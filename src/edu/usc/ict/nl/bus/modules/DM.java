@@ -31,8 +31,6 @@ import edu.usc.ict.nl.bus.events.DMSpeakEvent;
 import edu.usc.ict.nl.bus.events.Event;
 import edu.usc.ict.nl.bus.events.NLGEvent;
 import edu.usc.ict.nl.bus.events.NLUEvent;
-import edu.usc.ict.nl.bus.special_variables.SpecialEntitiesRepository;
-import edu.usc.ict.nl.bus.special_variables.SpecialVar;
 import edu.usc.ict.nl.config.NLBusConfig;
 import edu.usc.ict.nl.dm.reward.model.DialogueOperatorEffect;
 import edu.usc.ict.nl.kb.DialogueKBFormula;
@@ -108,7 +106,7 @@ public abstract class DM implements DMInterface {
 					logger.removeAppender(ofa);
 					fa.activateOptions();
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 			}
 		}
@@ -193,7 +191,7 @@ public abstract class DM implements DMInterface {
 				out.write("<?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?>\n");
 				out.write("<log id=\""+getSessionID()+"\">\n");
 				out.flush();
-			} catch (Exception e) {e.printStackTrace();}
+			} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 		}
 		private void writeNLGEventToLog(NLGEvent ev) throws Exception {
 			if (out!=null) {
@@ -356,7 +354,7 @@ public abstract class DM implements DMInterface {
 				chatLog.writeInformationStateChangeEventToLog(changes, "BEFORE Other EVENT");
 				chatLog.writeGenericEventToLog(ev);
 			}
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 	}
 
 	@Override
@@ -373,7 +371,7 @@ public abstract class DM implements DMInterface {
 		logger.info("Received kill command.");
 		try {
 			if (chatLog!=null) chatLog.closeChatLog();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 		logger.removeAllAppenders();
 	}
 

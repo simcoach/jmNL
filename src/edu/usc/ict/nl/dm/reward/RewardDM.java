@@ -34,12 +34,11 @@ import edu.usc.ict.nl.bus.events.NLGEvent;
 import edu.usc.ict.nl.bus.events.NLUEvent;
 import edu.usc.ict.nl.bus.events.SystemUtteranceDoneEvent;
 import edu.usc.ict.nl.bus.events.SystemUtteranceLengthEvent;
-import edu.usc.ict.nl.bus.events.changes.VarChange;
 import edu.usc.ict.nl.bus.events.changes.DMVarChangeEvent;
 import edu.usc.ict.nl.bus.events.changes.DMVarChangesEvent;
+import edu.usc.ict.nl.bus.events.changes.VarChange;
 import edu.usc.ict.nl.bus.modules.DM;
 import edu.usc.ict.nl.bus.modules.DMEventsListenerInterface;
-import edu.usc.ict.nl.bus.modules.NLG;
 import edu.usc.ict.nl.bus.modules.NLGInterface;
 import edu.usc.ict.nl.bus.special_variables.SpecialVar;
 import edu.usc.ict.nl.config.NLBusConfig;
@@ -51,8 +50,8 @@ import edu.usc.ict.nl.dm.reward.model.DialogueOperatorEntranceTransition;
 import edu.usc.ict.nl.dm.reward.model.DialogueOperatorNode;
 import edu.usc.ict.nl.dm.reward.model.DialogueOperatorNodesChain;
 import edu.usc.ict.nl.dm.reward.model.RewardPolicy;
-import edu.usc.ict.nl.dm.reward.model.TimemarksTracker;
 import edu.usc.ict.nl.dm.reward.model.RewardPolicy.OpType;
+import edu.usc.ict.nl.dm.reward.model.TimemarksTracker;
 import edu.usc.ict.nl.dm.reward.possibilityGraph.OperatorHistoryNode;
 import edu.usc.ict.nl.dm.reward.possibilityGraph.PossibleIS;
 import edu.usc.ict.nl.dm.reward.possibilityGraph.PossibleTransition;
@@ -78,6 +77,8 @@ import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.utils.Sanitizer;
 
 public class RewardDM extends DM {
+	
+    static final Logger sLogger = Logger.getLogger(RewardDM.class);
 	
 	// keeps track if the current DM session has reached a final state.
 	private boolean done=false;
@@ -292,7 +293,7 @@ public class RewardDM extends DM {
 							handleDefaultEvent(ev);
 						} catch (Exception e) {
 							logger.error(e);
-							e.printStackTrace();
+							logger.error(Sanitizer.log(e.getMessage()), e);
 						}
 						eventLock.release();
 					} else {
@@ -301,7 +302,7 @@ public class RewardDM extends DM {
 				}
 			} catch (Exception e) {
 				logger.error(e);
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 	
 			if (visualizer!=null) visualizer.updatedKB();
@@ -722,7 +723,7 @@ public class RewardDM extends DM {
 		try {
 			lastNonNullOperatorVariableFormula=DialogueKBFormula.create(NLBusBase.lastNonNullOperatorVariableName, null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			sLogger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	public static DialogueOperatorEffect updateLastNonNullOperatorVariableInWith(DialogueKBInterface is,DialogueOperator op) throws Exception {
@@ -794,7 +795,7 @@ public class RewardDM extends DM {
 		try {
 			currentAction = getCurrentActiveAction();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return (currentAction!=null)?currentAction.isWaitingForUser():false;
 	}
@@ -994,7 +995,7 @@ public class RewardDM extends DM {
 			incrementTimeSinceStart=DialogueOperatorEffect.createIncrementForVariable(NLBusBase.timeSinceStartVariableName,
 					DialogueKBFormula.create(NLBusBase.timerIntervalVariableName,null));
 		} catch (Exception e) {
-			e.printStackTrace();
+			sLogger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 
@@ -1750,7 +1751,7 @@ public class RewardDM extends DM {
 			}
 			else return getRootInformationState();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return getRootInformationState();
 	}

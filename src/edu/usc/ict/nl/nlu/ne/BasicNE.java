@@ -18,6 +18,7 @@ import edu.usc.ict.nl.nlu.Token;
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public abstract class BasicNE implements NamedEntityExtractorI {
 	private NLUConfig configuration;
@@ -95,7 +96,7 @@ public abstract class BasicNE implements NamedEntityExtractorI {
 								if (original!=null) {
 									newToken=new Token("<"+ne.getType().toUpperCase()+">", original.getType(), ne.getMatchedString(), start, end);
 								} else {
-									logger.error("Trying to generalize null NE ("+ne+"). NE list: "+nes);
+									logger.error(Sanitizer.log("Trying to generalize null NE ("+ne+"). NE list: "+nes));
 								}
 							}
 							inputTokens.set(j, newToken);

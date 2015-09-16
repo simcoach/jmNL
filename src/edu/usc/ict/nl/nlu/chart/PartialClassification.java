@@ -3,11 +3,17 @@ package edu.usc.ict.nl.nlu.chart;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.bus.modules.NLU;
 import edu.usc.ict.nl.nlu.NLUOutput;
 import edu.usc.ict.nl.util.Rational;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class PartialClassification {
+	
+    static final Logger logger = Logger.getLogger(PartialClassification.class);
+    
 	private String text;
 	private int start;
 	private int end;
@@ -49,7 +55,7 @@ public class PartialClassification {
 			result=nlu.getNLUOutput(text, null,null);
 			return (result!=null) && !result.isEmpty();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return false;
 	}

@@ -38,6 +38,7 @@ import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.XMLUtils;
 import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.util.graph.GraphElement;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class DialogueOperator extends edu.usc.ict.nl.util.graph.Node {
 	
@@ -67,7 +68,7 @@ public class DialogueOperator extends edu.usc.ict.nl.util.graph.Node {
 		/*try {
 			singleRunEffect=new DialogueOperatorEffect(DialogueKBFormula.create(getName(),null));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 			singleRunEffect=null;
 		}*/
 	}
@@ -116,7 +117,7 @@ public class DialogueOperator extends edu.usc.ict.nl.util.graph.Node {
 							Boolean result = (Boolean)is.evaluate(forgetCondition,null);
 							return (result!=null && result);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error(Sanitizer.log(e.getMessage()), e);
 						}
 					} else return true;
 				}
@@ -138,7 +139,7 @@ public class DialogueOperator extends edu.usc.ict.nl.util.graph.Node {
 				Boolean result = (Boolean)is.evaluate(cnd,null);
 				return (result!=null && result);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 		return true;
@@ -163,7 +164,7 @@ public class DialogueOperator extends edu.usc.ict.nl.util.graph.Node {
 			Node rootNode = doc.getDocumentElement();
 			if (isOperatorNode(rootNode)) return parseOperator(rootNode,op);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}
@@ -1264,7 +1265,7 @@ public class DialogueOperator extends edu.usc.ict.nl.util.graph.Node {
 			}
 			return (DialogueOperatorEntranceTransition) ec.parseTransition(n, att, fakeStart, this);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}

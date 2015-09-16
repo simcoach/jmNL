@@ -37,6 +37,7 @@ import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public abstract class NLU implements NLUInterface {
 
@@ -220,7 +221,7 @@ public abstract class NLU implements NLUInterface {
 								ce.addResult(null,u);
 							}
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error(Sanitizer.log(e.getMessage()), e);
 						}
 					}
 				}
@@ -400,7 +401,7 @@ public abstract class NLU implements NLUInterface {
 		try {
 			return (List<String>) featuresBuilder.invoke(null, utt);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}
@@ -410,7 +411,7 @@ public abstract class NLU implements NLUInterface {
 		try {
 			return (List<String>) featuresAtPosBuilder.invoke(null, tokens,pos);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}

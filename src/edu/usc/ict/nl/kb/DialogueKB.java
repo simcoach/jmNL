@@ -27,6 +27,7 @@ import edu.usc.ict.nl.dm.reward.model.XMLConstants;
 import edu.usc.ict.nl.kb.VariableProperties.PROPERTY;
 import edu.usc.ict.nl.util.XMLUtils;
 import edu.usc.ict.nl.util.graph.Node;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public abstract class DialogueKB extends Node implements DialogueKBInterface {
 
@@ -210,7 +211,9 @@ public abstract class DialogueKB extends Node implements DialogueKBInterface {
 					DialogueOperatorEffect eff=null;
 					try {
 						eff=DialogueOperatorEffect.parse(RewardPolicy.getInitNodeValue(childAtt));
-					} catch (Exception e) {e.printStackTrace();}
+					} catch (Exception e) {
+						logger.error(Sanitizer.log(e.getMessage()), e);
+					}
 					if (eff!=null) {
 						if (ret==null) ret=new ArrayList<DialogueOperatorEffect>();
 						ret.add(eff);

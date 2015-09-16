@@ -3,13 +3,19 @@ package edu.usc.ict.nl.nlg.directablechar;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
+import edu.usc.ict.nl.nlu.TrainNLU;
 import edu.usc.ict.nl.nlu.directablechar.ReplyMessageProcessor;
+import edu.usc.ict.nl.utils.Sanitizer;
 import edu.usc.ict.nl.vhmsg.VHBridge;
 import edu.usc.ict.vhmsg.MessageEvent;
 import edu.usc.ict.vhmsg.MessageListener;
 
 public class Messanger {
 	private VHBridge vhBridge;
+	
+	private static final Logger logger = Logger.getLogger(Messanger.class);
 
 	public Messanger() {
 		vhBridge=new VHBridge("localhost", "DEFAULT_SCOPE");
@@ -31,7 +37,7 @@ public class Messanger {
 				boolean r = lock.tryAcquire(secondsTimeout, TimeUnit.SECONDS);
 				if (!r) System.err.println("timeout");
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 			vhBridge.removeMessageListener(l);
 		}

@@ -10,14 +10,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.scxml.model.CustomAction;
+import org.apache.log4j.Logger;
 
 import edu.usc.ict.nl.dm.fsm.SCXMLDisableState;
 import edu.usc.ict.nl.dm.fsm.SCXMLEnableState;
 import edu.usc.ict.nl.nlg.VRexpressBasicNLG;
+import edu.usc.ict.nl.nlu.fst.train.Aligner;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.Sanitizer;
 
 public class NLBusConfig extends NLConfig {
+	
+    static final Logger logger = Logger.getLogger(Aligner.class);
+    
 	public static final String DM_INTERNAL_ID = "dialogManager";
 	public static final String SIMCOACH_INTERNAL_ID = "simcoach";
 
@@ -141,12 +146,12 @@ public class NLBusConfig extends NLConfig {
 							Object value=f.get(this);
 							System.out.println("setting field: "+f.getName()+" from "+f.get(ret)+" to "+value);
 							f.set(ret, value);
-						} catch (IllegalAccessException e) {e.printStackTrace()}
+						} catch (IllegalAccessException e) {logger.error(Sanitizer.log(e.getMessage()), e)}
 					}
 				}
 			}
 		*/
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 		return ret;
 	}
 	

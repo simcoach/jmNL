@@ -58,6 +58,7 @@ import edu.usc.ict.nl.util.Triple;
 import edu.usc.ict.nl.utils.EnglishWrittenNumbers2Digits;
 import edu.usc.ict.nl.utils.ExcelUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 import edu.usc.ict.nl.utils.SpellCheckProcess;
 
 public class BuildTrainingData {
@@ -213,16 +214,16 @@ public class BuildTrainingData {
 		try {
 			td=buildConfiguredTrainingDataFromExcel(userFile.getAbsolutePath());
 		} catch (Exception e) {
-        	logger.error("Error processing file: "+userFile.getAbsolutePath()+" "+e.getMessage());
+        	logger.error(Sanitizer.log("Error processing file: "+userFile.getAbsolutePath()+" "+e.getMessage()));
 			td=new ArrayList<TrainingDataFormat>();
 		}
 		
-        File userSessionFile=new File(config.getNLUContentRoot()+File.separator+"user-utterances-from-user-data-collection.xlsx");
+        File userSessionFile=new File(Sanitizer.file(config.getNLUContentRoot()+File.separator+"user-utterances-from-user-data-collection.xlsx"));
         if (userSessionFile.exists())
 	        try {
 	        	addToTrainingData(td,buildConfiguredTrainingDataFromExcel(userSessionFile.getAbsolutePath()));
 	        } catch (Exception e) {
-	        	logger.warn("Error processing file: "+userSessionFile.getAbsolutePath()+" "+e.getMessage());
+	        	logger.warn(Sanitizer.log("Error processing file: "+userSessionFile.getAbsolutePath()+" "+e.getMessage()));
 	        }
         
         if (!StringUtils.isEmptyString(config.getSystemForms())) {
@@ -231,7 +232,7 @@ public class BuildTrainingData {
         		try {
         			addToTrainingData(td,buildTrainingDataFromFormsExcel(formsFile.getAbsolutePath(), 0));
         		} catch (Exception e) {
-        			logger.warn("Error processing file: "+formsFile.getAbsolutePath()+" "+e.getMessage());
+        			logger.warn(Sanitizer.log("Error processing file: "+formsFile.getAbsolutePath()+" "+e.getMessage()));
         		}
         	}
         }
@@ -363,7 +364,7 @@ public class BuildTrainingData {
 				List<TrainingDataFormat> ltd = buildTrainingDataFromExcelSessionsExport(filename,0);
 				addToTrainingData(td, ltd, false);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 		return td;
@@ -377,7 +378,7 @@ public class BuildTrainingData {
 				ArrayList<Pair<String, String>> ltd = getSystemUserPairsFromExcelSessionsExport(filename,0);
 				td.addAll(ltd);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 		return td;
@@ -1027,8 +1028,8 @@ public class BuildTrainingData {
 			String nu=prepareUtteranceForClassification(d.getUtterance());
 			if (StringUtils.isEmptyString(nu)) {
 				logger.error("Empty utterance after filters to prepare it from training: ");
-				logger.error("start='"+d.getUtterance()+"'");
-				logger.error("end='"+nu+"'");
+				logger.error(Sanitizer.log("start='"+d.getUtterance()+"'"));
+				logger.error(Sanitizer.log("end='"+nu+"'"));
 			} else {
 				ret.add(new TrainingDataFormat(nu, d.getLabel()));
 			}
@@ -1519,15 +1520,15 @@ public class BuildTrainingData {
 					for(String u:us) {
 						if (ret==null) ret=new ArrayList<TrainingDataFormat>();
 						if (StringUtils.isEmptyString(u) || StringUtils.isEmptyString(k)) {
-							logger.error("Empty utterance or label: "+xlsx);
-							logger.error("utterance: '"+u+"'");
-							logger.error("label: '"+k+"'");
+							logger.error(Sanitizer.log("Empty utterance or label: "+xlsx));
+							logger.error(Sanitizer.log("utterance: '"+u+"'"));
+							logger.error(Sanitizer.log("label: '"+k+"'"));
 						}
 						try {
 							ret.add(new TrainingDataFormat(u, k,!discardEmptyLabels));
 						} catch (Exception e) {
-							logger.error("ignored instance because: "+e.getMessage());
-							logger.error("Error processing file: "+xlsx);
+							logger.error(Sanitizer.log("ignored instance because: "+e.getMessage()));
+							logger.error(Sanitizer.log("Error processing file: "+xlsx));
 						}
 					}
 				}
@@ -1544,15 +1545,15 @@ public class BuildTrainingData {
 				String u=kv.getSecond();
 				if (ret==null) ret=new ArrayList<TrainingDataFormat>();
 				if (StringUtils.isEmptyString(u) || StringUtils.isEmptyString(k)) {
-					logger.error("Empty utterance or label: "+xlsx);
-					logger.error("utterance: '"+u+"'");
-					logger.error("label: '"+k+"'");
+					logger.error(Sanitizer.log("Empty utterance or label: "+xlsx));
+					logger.error(Sanitizer.log("utterance: '"+u+"'"));
+					logger.error(Sanitizer.log("label: '"+k+"'"));
 				}
 				try {
 					ret.add(new TrainingDataFormat(u, k,noAutofillLabel));
 				} catch (Exception e) {
 					logger.error(e);
-					logger.error("Error processing file: "+xlsx);
+					logger.error(Sanitizer.log("Error processing file: "+xlsx));
 				}
 			}
 		}
@@ -1666,7 +1667,7 @@ public class BuildTrainingData {
 			//System.out.println(EnglishWrittenNumbers2Digits.parseWrittenNumbers(tokens));
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 	/**

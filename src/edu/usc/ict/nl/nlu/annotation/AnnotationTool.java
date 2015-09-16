@@ -51,6 +51,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.Logger;
 
 import edu.usc.ict.nl.nlu.BuildTrainingData;
 import edu.usc.ict.nl.nlu.TrainingDataFormat;
@@ -61,9 +62,12 @@ import edu.usc.ict.nl.util.AhoCorasick.MatchList;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.ExcelUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class AnnotationTool extends JDialog implements WindowListener, ActionListener, DocumentListener, KeyListener {
 
+	static final Logger logger = Logger.getLogger(AnnotationTool.class);
+	
 	private JTextField searchBox;
 	private JLabel counter;
 	private JTextArea utteranceBox;
@@ -364,7 +368,7 @@ public class AnnotationTool extends JDialog implements WindowListener, ActionLis
                 updateList(null);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(Sanitizer.log(e.getMessage()), e);
         }
     }
 	private Set<Integer> doSearch(String q) {

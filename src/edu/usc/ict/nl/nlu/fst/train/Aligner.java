@@ -3,7 +3,6 @@ package edu.usc.ict.nl.nlu.fst.train;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -30,8 +30,11 @@ import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StreamGobbler;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.ExcelUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class Aligner {
+	
+    static final Logger logger = Logger.getLogger(Aligner.class);
 	
 	protected File in=null;
 	protected File out=null;
@@ -76,11 +79,11 @@ public class Aligner {
 					if (ret==null) ret=new ArrayList<Alignment>();
 					ret.add(al);
 				} catch (Exception e) {
-					e.printStackTrace();
-					System.err.println("Error while processing line "+line+" in these files:");
-					System.err.println("source file: "+source);
-					System.err.println("target file: "+target);
-					System.err.println("aligner file: "+aligner);
+					logger.error(Sanitizer.log(e.getMessage()), e);
+					logger.error(Sanitizer.log("Error while processing line "+line+" in these files:"));
+					logger.error(Sanitizer.log("source file: "+source));
+					logger.error(Sanitizer.log("target file: "+target));
+					logger.error(Sanitizer.log("aligner file: "+aligner));
 				}
 			}
 			line++;
@@ -203,7 +206,7 @@ public class Aligner {
 		try {
 			atds = BuildTrainingData.extractTrainingDataFromExcel(extra, 0, 0, 1);
 		} catch (Exception e) {
-			System.err.println("WARNING while using extra file (i.e. dictionary/lexicon) (set to: '"+extra+"') for alignment: "+e.getMessage());
+			logger.error(Sanitizer.log("WARNING while using extra file (i.e. dictionary/lexicon) (set to: '"+extra+"') for alignment: "+e.getMessage()));
 		}
 		if (atds==null) atds=new ArrayList<TrainingDataFormat>();
 		atds.addAll(tds);

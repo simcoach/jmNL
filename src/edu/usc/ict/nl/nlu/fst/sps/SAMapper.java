@@ -32,6 +32,7 @@ import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.util.Triple;
 import edu.usc.ict.nl.utils.ExcelUtils;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SAMapper {
 
@@ -191,7 +192,7 @@ public class SAMapper {
 						ret.add(new Triple<String, String, String>(td.getUtterance(), convertSA(td.getId()), fstNLUOutputs));
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 			}
 
@@ -210,7 +211,7 @@ public class SAMapper {
 				try {
 					error|=addMapping(utterance,spsSA,fstNluOutput);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(Sanitizer.log(e.getMessage()), e);
 				}
 			}
 		}
@@ -404,7 +405,7 @@ public class SAMapper {
 		try {
 			result=getSAFromFullConstraintsMatch(constraints);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		if (result!=null) return result;
 		if (doRelaxedMatch) result=getSAsFromSingleConstraintMatches(constraints);

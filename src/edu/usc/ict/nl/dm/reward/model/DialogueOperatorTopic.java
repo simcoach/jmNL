@@ -6,6 +6,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class DialogueOperatorTopic extends edu.usc.ict.nl.util.graph.Node {
 
@@ -35,7 +36,7 @@ public class DialogueOperatorTopic extends edu.usc.ict.nl.util.graph.Node {
 				if (parent!=null && parent.hasParents()) totalName=parent.getName()+separator+totalName;
 				else return totalName;
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(Sanitizer.log(e.getMessage()), e);
 			}
 		}
 	}

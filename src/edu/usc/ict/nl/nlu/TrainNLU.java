@@ -13,13 +13,14 @@ import edu.usc.ict.nl.bus.modules.NLUInterface;
 import edu.usc.ict.nl.config.NLConfig;
 import edu.usc.ict.nl.config.NLUConfig;
 import edu.usc.ict.nl.utils.LogConfig;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class TrainNLU {
 
 	static protected AbstractApplicationContext context;
 	private static TrainNLU _instance;
 	
-	public static final Logger logger = Logger.getLogger(TrainNLU.class.getName());
+	protected static final Logger logger = Logger.getLogger(TrainNLU.class.getName());
 
 	protected NLUConfig configuration;
 	private NLUInterface nlu;
@@ -63,7 +64,7 @@ public class TrainNLU {
 			logger.info("Done training, now testing.");
 			nlu.retrain();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		logger.info("Done.");
 	}

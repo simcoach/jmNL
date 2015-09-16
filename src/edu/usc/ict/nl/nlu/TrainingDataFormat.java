@@ -3,11 +3,17 @@ package edu.usc.ict.nl.nlu;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import edu.usc.ict.nl.bus.modules.NLU;
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class TrainingDataFormat {
+	
+	private static final Logger logger = Logger.getLogger(TrainingDataFormat.class);
+	
 	// extra fields of information
 	public static final String FILE = "file";
 	
@@ -61,7 +67,7 @@ public class TrainingDataFormat {
 		try {
 			fs = FunctionalLibrary.printCollection(nlu.getFeaturesFromUtterance(getUtterance()), "", "", " ");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		if (!StringUtils.isEmptyString(fs)) return "<s> "+utt+" </s>\n"+fs+"\n\n"+label+"\n\n";
 		else return "<s> "+utt+" </s>\n\n"+label+"\n\n";

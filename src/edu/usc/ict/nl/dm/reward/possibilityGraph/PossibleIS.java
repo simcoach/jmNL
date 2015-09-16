@@ -28,6 +28,7 @@ import edu.usc.ict.nl.util.Rational;
 import edu.usc.ict.nl.util.Triple;
 import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.util.graph.GraphElement;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class PossibleIS extends OperatorHistoryNode {
 	
@@ -161,10 +162,22 @@ public class PossibleIS extends OperatorHistoryNode {
 		DialogueKB is=getValue();
 		
 		Pair<DialogueKB, Float> is_reward = updateISAndgetReward(is,chain);
-		PossibleIS targetIS=new PossibleIS(chain.getOperator(),PossibleIS.Type.CHAIN, (chain!=null)?chain.toString():"", is_reward.getFirst(), dormantActions);
+		final DialogueOperator op;
+		final String strChain;
+		final Rational rational;
+		if (chain != null) {
+			op = chain.getOperator();
+			strChain = chain.toString();
+			rational = chain.getRationalWeight();
+		} else {
+			op = null;
+			strChain = "";
+			rational = null;
+		}
+		PossibleIS targetIS=new PossibleIS(op, PossibleIS.Type.CHAIN, strChain, is_reward.getFirst(), dormantActions);
 		targetIS.removeDormantAction(ec.getOperator());
 		targetIS.setChainReward(is_reward.getSecond());
-		targetIS.setWeight(chain.getRationalWeight());
+		targetIS.setWeight(rational);
 		assert(targetIS.getWeight()>0);
 		
 		addEdgeTo(targetIS,ec,chain);
@@ -196,7 +209,7 @@ public class PossibleIS extends OperatorHistoryNode {
 			}
 			return ret;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return null;
 	}
@@ -215,7 +228,7 @@ public class PossibleIS extends OperatorHistoryNode {
 			//return "node: { color: "+getGDLColor()+" title: \""+getID()+"\" label: \""+toString()+"\" info1: \""+prettyPrintKB()+"\" info2: \""+dormantActions+"\" info3:\""+getValue().getContentID()+"\"}\n";
 			return "node: { color: "+getGDLColor()+" title: \""+getID()+"\" label: \""+toString()+"\" info1: \"\" info2: \""+dormantActions+"\" info3:\""+getValue().getContentID()+"\"}\n";
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		return "node: { color: "+getGDLColor()+" title: \""+getID()+"\" label: \""+toString()+"\" info1: \"error while printing\"}\n";
 	}

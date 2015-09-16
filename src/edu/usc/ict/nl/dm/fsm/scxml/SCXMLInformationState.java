@@ -1,6 +1,5 @@
 package edu.usc.ict.nl.dm.fsm.scxml;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,6 +17,7 @@ import edu.usc.ict.nl.dm.reward.model.DialogueOperatorEffect;
 import edu.usc.ict.nl.kb.DialogueKB;
 import edu.usc.ict.nl.kb.DialogueKBFormula;
 import edu.usc.ict.nl.kb.EvalContext;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class SCXMLInformationState extends DialogueKB {
 
@@ -240,7 +240,7 @@ public class SCXMLInformationState extends DialogueKB {
 		try {
 			setValueOfVariable(vName, value,ACCESSTYPE.AUTO_OVERWRITEAUTO);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 	}
 /*

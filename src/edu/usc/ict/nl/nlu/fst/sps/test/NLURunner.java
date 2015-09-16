@@ -29,6 +29,8 @@ import edu.usc.ict.nl.utils.Sanitizer;
 
 public class NLURunner {
 	
+    static final Logger logger = Logger.getLogger(NLURunner.class);
+	
 	public static String defaultInternalNluClass = "edu.usc.ict.nl.nlu.mxnlu.MXClassifierNLU";
 	public static String defaultFeatureBuilderClass = "edu.usc.ict.nl.nlu.features.FeaturesBuilderForMXClassifier";
 	
@@ -174,7 +176,7 @@ public class NLURunner {
 			merger = new edu.usc.ict.nl.nlu.multi.merger.Cascade("stage1_mh_and_hpi", args);
 			mainNLU.setMergerForMultiNlu(merger);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		
 		mainNLU.setnBest(3);
@@ -215,7 +217,7 @@ public class NLURunner {
 			merger = new edu.usc.ict.nl.nlu.multi.merger.Cascade("stage1", args);
 			stage1andfst.setMergerForMultiNlu(merger);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		NLUConfig backup=(NLUConfig) NLUConfig.WIN_EXE_CONFIG.clone();
 	
@@ -245,7 +247,7 @@ public class NLURunner {
 			merger2 = new edu.usc.ict.nl.nlu.multi.merger.Cascade("fst", args);
 			mainNLU.setMergerForMultiNlu(merger2);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
 		
 		mainNLU.setnBest(3);

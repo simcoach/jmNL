@@ -32,11 +32,10 @@ import edu.usc.ict.nl.kb.template.PrimaryTemplateDefinitionException;
 import edu.usc.ict.nl.kb.template.TemplateProcessing;
 import edu.usc.ict.nl.kb.template.TemplateText;
 import edu.usc.ict.nl.kb.template.util.TemplateVerifier;
-import edu.usc.ict.nl.ui.chat.ChatInterface;
-import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.ExcelUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class EchoNLG extends NLG {
 
@@ -48,7 +47,7 @@ public class EchoNLG extends NLG {
 		super(c);
 		try {
 			reloadData();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 	}
 	
 	private void loadSystemResources() throws Exception {
@@ -357,9 +356,9 @@ public class EchoNLG extends NLG {
 	@Override
 	public void reloadData() throws Exception {
 		logger.info("re-loading data.");
-		try {loadSystemUtterances();}catch (Exception e) {e.printStackTrace();}
-		try {loadSystemForms();}catch (Exception e) {e.printStackTrace();}
-		try {loadSystemResources();}catch (Exception e) {e.printStackTrace();}
+		try {loadSystemUtterances();}catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
+		try {loadSystemForms();}catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
+		try {loadSystemResources();}catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
 		logger.info("done loading data.");
 	}
 }
