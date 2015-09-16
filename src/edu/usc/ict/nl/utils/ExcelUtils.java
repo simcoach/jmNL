@@ -672,13 +672,13 @@ public class ExcelUtils {
 
 	public static void main(String[] args) throws Exception {
 		//test("Simcoach_BillFord_TextNotes.xlsx", 0,1);
-		List<File> files = FileUtils.getAllFiles(new File("C:\\Users\\morbini\\Desktop\\tmp\\sail-kiosk\\Plists\\"), ".*\\.xls");
+		List<File> files = FileUtils.getAllFiles(new File(Sanitizer.file(FileUtil.path("C:\\Users\\morbini\\Desktop\\tmp\\sail-kiosk\\Plists\\"))), ".*\\.xls");
 		Map<String, List<String>> m=new HashMap<String, List<String>>();
 		for (File f:files) {
 			Map<String, List<String>> tmp = extractMappingBetweenTheseTwoColumns(f.getAbsolutePath(), 0, 0, 1,false);
 			m.putAll(tmp);
 		}
-		dumpMapToExcel((Map)m, new File("C:\\Users\\morbini\\Desktop\\tmp\\sail-kiosk\\Plists\\combined.xlsx"), "plist", new String[]{"question","text"});
+		dumpMapToExcel((Map)m, new File(Sanitizer.file(FileUtil.path("C:\\Users\\morbini\\Desktop\\tmp\\sail-kiosk\\Plists\\combined.xlsx"))), "plist", new String[]{"question","text"});
 		System.exit(1);
 		generateSasoLightTemplateFromSystemUtt("resources/characters/Ellie_DCAPS/content/system-utterances-woz.xlsx", 0);
 	}

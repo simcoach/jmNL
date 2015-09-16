@@ -34,6 +34,7 @@ import edu.usc.ict.nl.nlu.BuildTrainingData;
 import edu.usc.ict.nl.nlu.TrainingDataFormat;
 import edu.usc.ict.nl.nlu.mxnlu.MXClassifierProcess;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class MalletMaxEntClassifierProcess extends MXClassifierProcess {
 
@@ -67,8 +68,9 @@ public class MalletMaxEntClassifierProcess extends MXClassifierProcess {
 	@Override
 	public void run(String model, int nb) throws Exception {
 		nBest=nb;
-		if (model != null)
-			classifier=loadClassifier(new File(model));
+		if (model != null) {
+			classifier=loadClassifier(new File(Sanitizer.file(model)));
+		}
 	}
 
 	public MaxEnt loadClassifier(File serializedFile) {

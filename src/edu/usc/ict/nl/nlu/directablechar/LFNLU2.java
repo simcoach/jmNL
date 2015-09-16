@@ -17,6 +17,7 @@ import edu.usc.ict.nl.nlu.directablechar.ObjectKB.SHAPE;
 import edu.usc.ict.nl.nlu.directablechar.ObjectKB.SIZE;
 import edu.usc.ict.nl.util.FileUtils;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.Sanitizer;
 
 public class LFNLU2 extends NLU {
 
@@ -60,7 +61,7 @@ public class LFNLU2 extends NLU {
 		try {
 			resolverAxioms=internalnlu.getObjectKB().generateAxioms();
 		} catch (NullPointerException e) {}
-		File baseKb=new File(getConfiguration().getNLUContentRoot(),"kb.txt");
+		File baseKb=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),"kb.txt"));
 		StringBuffer kb=FileUtils.readFromFile(baseKb.getAbsolutePath());
 		if (resolverAxioms!=null) kb.append(resolverAxioms);
 		return kb;

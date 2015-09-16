@@ -23,6 +23,7 @@ import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
+import edu.usc.ict.nl.utils.FileUtil;
 import edu.usc.ict.nl.utils.Sanitizer;
 
 public class FSTNLU extends NLU {
@@ -33,9 +34,9 @@ public class FSTNLU extends NLU {
 	
 	public FSTNLU(NLUConfig c) throws Exception {
 		super(c);
-		File in=new File(c.getFstInputSymbols());
-		File out=new File(c.getFstOutputSymbols());
-		File model=new File(c.getNluModelFile());
+		File in=new File(FileUtil.path(c.getFstInputSymbols()));
+		File out=new File(FileUtil.path(c.getFstOutputSymbols()));
+		File model=new File(FileUtil.path(c.getNluModelFile()));
 		tf=new TraverseFST(in,out,model,c.getRunningFstCommand());
 		if (!in.exists() || !out.exists() || !model.exists()) {
 			logger.warn("input/output/model not existing, retraining...");
@@ -184,7 +185,7 @@ public class FSTNLU extends NLU {
 	
 	public AlignmentSummary readAlignerInfo() throws Exception {
 		NLUConfig c = getConfiguration();
-		Aligner a=new Aligner(new File(c.getNLUContentRoot()));
+		Aligner a=new Aligner(new File(Sanitizer.file(c.getNLUContentRoot())));
 		List<Alignment> as = a.readAlignerOutputFile();
 		AlignmentSummary asum=new AlignmentSummary(as);
 		return asum;
@@ -219,8 +220,8 @@ public class FSTNLU extends NLU {
 	@Override
 	public void loadModel(File model) throws Exception {
 		NLUConfig c = getConfiguration();
-		File in=new File(c.getFstInputSymbols());
-		File out=new File(c.getFstOutputSymbols());
+		File in=new File(Sanitizer.file(c.getFstInputSymbols()));
+		File out=new File(Sanitizer.file(c.getFstOutputSymbols()));
 		logger.warn("loading fst model using predefined input and output symbols:");
 		logger.warn(" new model: "+model.getAbsolutePath());
 		logger.warn(" input symbols: "+in.getAbsolutePath());

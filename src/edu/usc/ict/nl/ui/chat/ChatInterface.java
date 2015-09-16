@@ -517,6 +517,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 	@Override
 	public void terminateSession(Long sid) {
 		try {
+<<<<<<< HEAD
 			if (ChatInterface.sid!=sid) logger.warn("chat interface received a terminated session with id ("+sid+") different from chat session id: "+ChatInterface.sid);
 			ChatInterface.sid=null;
 			if (input.isEnabled() && !finishedSession) {
@@ -528,6 +529,21 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 				alreadyAskedFeedbackAtEnd=true;
 				displayState=MainDisplayStatus.FEEDBACK;
 				setDisplayAccordingToState();
+=======
+			if (ChatInterface.sid!=null) {
+				if (!ChatInterface.sid.equals(sid)) NLBus.logger.warn("chat interface received a terminated session with id ("+sid+") different from chat session id: "+ChatInterface.sid);
+				ChatInterface.sid=null;
+				if (input.isEnabled() && !finishedSession) {
+					disableInput("");
+					addTextToList("END SESSION",MessageType.SYSTEM);
+					finishedSession=true;
+				}
+				if (!alreadyAskedFeedbackAtEnd) {
+					alreadyAskedFeedbackAtEnd=true;
+					displayState=MainDisplayStatus.FEEDBACK;
+					setDisplayAccordingToState();
+				}
+>>>>>>> fmorbini/master
 			}
 		} catch (Exception e) {
 			displayError(e,true);
@@ -744,8 +760,7 @@ public class ChatInterface extends JPanel implements KeyListener, WindowListener
 					DM dm = nlModule.getPolicyDMForSession(sid, false);
 					dm.setPauseEventProcessing(true);
 					try {
-						File dump=nlModule.getNewInformationStateFileName(sid);
-						nlModule.saveInformationStateForSession(sid,dump);
+						nlModule.saveInformationStateForSession(sid,true);
 					} catch (Exception t) {
 						displayError(t,false);
 					}
