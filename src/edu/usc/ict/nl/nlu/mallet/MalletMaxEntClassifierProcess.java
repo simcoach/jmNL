@@ -90,9 +90,9 @@ public class MalletMaxEntClassifierProcess extends MXClassifierProcess {
 	}
 
 	public void saveClassifier(Classifier classifier, File serializedFile) throws IOException {
-		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream (serializedFile));
-		oos.writeObject (classifier);
-		oos.close();
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream (serializedFile))) {
+			oos.writeObject (classifier);
+		}
 	}
 
     

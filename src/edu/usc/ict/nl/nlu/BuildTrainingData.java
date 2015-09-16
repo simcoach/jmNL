@@ -296,34 +296,34 @@ public class BuildTrainingData {
 
 	
 	public void dumpIORDataInImportableTXT(HashMap<String, Pair<String, Collection<String>>> iorData,String lineFile,String speechActFile,String linksFile) throws IOException {
-		BufferedWriter lineOut=new BufferedWriter(new FileWriter(lineFile));
-		BufferedWriter saOut=new BufferedWriter(new FileWriter(speechActFile));
-		BufferedWriter linksOut=new BufferedWriter(new FileWriter(linksFile));
-		HashSet<String> sas=new HashSet<String>();
-		for (String line:iorData.keySet()) {
-			Pair<String, Collection<String>> saAndSystemUttsPrecedingIt=iorData.get(line);
-			String sa=saAndSystemUttsPrecedingIt.getFirst();
-			Collection<String> systemUtts=saAndSystemUttsPrecedingIt.getSecond();
-			
-			String userLine="";
-			for (String systemUtt:systemUtts) {
-				userLine+="SIMCOACH: "+systemUtt+"\n";
+		try (
+			BufferedWriter lineOut=new BufferedWriter(new FileWriter(lineFile));
+			BufferedWriter saOut=new BufferedWriter(new FileWriter(speechActFile));
+			BufferedWriter linksOut=new BufferedWriter(new FileWriter(linksFile))
+		) {
+			HashSet<String> sas=new HashSet<String>();
+			for (String line:iorData.keySet()) {
+				Pair<String, Collection<String>> saAndSystemUttsPrecedingIt=iorData.get(line);
+				String sa=saAndSystemUttsPrecedingIt.getFirst();
+				Collection<String> systemUtts=saAndSystemUttsPrecedingIt.getSecond();
+				
+				String userLine="";
+				for (String systemUtt:systemUtts) {
+					userLine+="SIMCOACH: "+systemUtt+"\n";
+				}
+				userLine+="=> "+line+"\n\n";
+	
+				if (!StringUtils.isEmptyString(sa)) {
+					sas.add(sa);
+					linksOut.write(userLine+"\n\n"+sa+"\n\n");
+				}
+	
+				lineOut.write(userLine);
 			}
-			userLine+="=> "+line+"\n\n";
-
-			if (!StringUtils.isEmptyString(sa)) {
-				sas.add(sa);
-				linksOut.write(userLine+"\n\n"+sa+"\n\n");
+			for(String sa:sas) {
+				saOut.write(sa+"\n\n");
 			}
-
-			lineOut.write(userLine);
 		}
-		for(String sa:sas) {
-			saOut.write(sa+"\n\n");
-		}
-		lineOut.close();
-		saOut.close();
-		linksOut.close();
 	}
 	public HashMap<String, Pair<String, Collection<String>>> produceDataForIOR(List<TrainingDataFormat> data, List<Pair<String, String>> suPairs) throws Exception {
 		HashMap<String, Pair<String, Collection<String>>> ad=new HashMap<String, Pair<String,Collection<String>>>();
@@ -570,16 +570,16 @@ public class BuildTrainingData {
 			File hardLinksFile=null;
 			Set<String> ret=null; 
 			if (!StringUtils.isEmptyString(hardLinksFileName) && ((hardLinksFile=new File(hardLinksFileName)).exists())) {
-				BufferedReader in=new BufferedReader(new FileReader(hardLinksFile));
-				String line;
-				while ((line=in.readLine())!=null) {
-					line=StringUtils.cleanupSpaces(line);
-					if (!StringUtils.isEmptyString(line)) {
-						if (ret==null) ret=new HashSet<String>();
-						ret.add(line);
+				try (BufferedReader in=new BufferedReader(new FileReader(hardLinksFile))) {
+					String line;
+					while ((line=in.readLine())!=null) {
+						line=StringUtils.cleanupSpaces(line);
+						if (!StringUtils.isEmptyString(line)) {
+							if (ret==null) ret=new HashSet<String>();
+							ret.add(line);
+						}
 					}
 				}
-				in.close();
 			}
 			hardLinks=ret;
 			return ret;
@@ -1135,36 +1135,38 @@ public class BuildTrainingData {
 
 	public static void dumpTextToTextLabelSequence(List<TrainingDataFormat> data, File outFile) throws IOException {
 		if (data!=null) {
-			BufferedWriter out=new BufferedWriter(new FileWriter(outFile));
-			if (outFile.exists()) outFile.delete();
-			for(TrainingDataFormat td:data) {
-				String utt=td.getUtterance().toLowerCase();
-				String label=td.getLabel();
-				out.write(utt+"\n"+label+"\n");
+			try (BufferedWriter out=new BufferedWriter(new FileWriter(outFile))) {
+				if (outFile.exists()) outFile.delete();
+				for(TrainingDataFormat td:data) {
+					String utt=td.getUtterance().toLowerCase();
+					String label=td.getLabel();
+					out.write(utt+"\n"+label+"\n");
+				}
 			}
-			out.close();
 		}
 	}
 	public static void dumpTrainingDataToMXNLUFormat(List<TrainingDataFormat> data, File outFile) throws IOException {
 		if (data!=null) {
-			BufferedWriter out=new BufferedWriter(new FileWriter(outFile));
-			if (outFile.exists()) outFile.delete();
-			for(TrainingDataFormat td:data) {
-				String s=td.toNluformat(null);
-				out.write(s);
+			try (
+				BufferedWriter out=new BufferedWriter(new FileWriter(outFile))
+			) {
+				if (outFile.exists()) outFile.delete();
+				for(TrainingDataFormat td:data) {
+					String s=td.toNluformat(null);
+					out.write(s);
+				}
 			}
-			out.close();
 		}
 	}
 	public static void dumpTextFromTrainingDataForLM(List<TrainingDataFormat> data, File outFile) throws IOException {
 		if (data!=null) {
-			BufferedWriter out=new BufferedWriter(new FileWriter(outFile));
-			if (outFile.exists()) outFile.delete();
-			for(TrainingDataFormat td:data) {
-				String utt=td.getUtterance().toUpperCase();
-				out.write(utt+"\n");
+			try (BufferedWriter out=new BufferedWriter(new FileWriter(outFile))) {
+				if (outFile.exists()) outFile.delete();
+				for(TrainingDataFormat td:data) {
+					String utt=td.getUtterance().toUpperCase();
+					out.write(utt+"\n");
+				}
 			}
-			out.close();
 		}
 	}
 	public static void buildArpaLM(File text,File output) throws Exception {
@@ -1182,35 +1184,36 @@ public class BuildTrainingData {
 	}
 	
 	public ArrayList<Pair<String,Collection<String>>> readIORExportedLinks(String fileName) throws Exception {
-		BufferedReader inp=new BufferedReader(new FileReader(fileName));
-		ArrayList<Pair<String,Collection<String>>> ret=new ArrayList<Pair<String,Collection<String>>>();
-		String line=null;
-		String text="";
-		Collection<String> sas=null;
-		Pair<String, Collection<String>> lastItem=null;
-		boolean foundText=false;
-		while((line=inp.readLine())!=null) {
-			if (!StringUtils.isEmptyString(line)) {
-				if (!foundText) text+=line;
-				else sas.add(line);
-			} else {
-				foundText=!foundText;
-				if (!foundText) {
-					text=text.replaceFirst("^.*=>[\\s]*", "");
-					text=prepareUtteranceForClassification(text);
-					if (sas == null) { sas=new HashSet<String>(); }
-					if ((lastItem!=null) && text.equals(lastItem.getFirst())) {
-						lastItem.getSecond().addAll(sas);
-					} else {
-						ret.add(lastItem=new Pair<String, Collection<String>>(text, sas));
-					}
-					text="";
+		ArrayList<Pair<String,Collection<String>>> toReturn = new ArrayList<Pair<String,Collection<String>>>();
+		try (BufferedReader inp = new BufferedReader(new FileReader(fileName))) {
+			String line=null;
+			String text="";
+			Collection<String> sas=null;
+			Pair<String, Collection<String>> lastItem=null;
+			boolean foundText=false;
+			while((line=inp.readLine())!=null) {
+				if (!StringUtils.isEmptyString(line)) {
+					if (!foundText) text+=line;
+					else sas.add(line);
 				} else {
-					sas=new HashSet<String>();
+					foundText=!foundText;
+					if (!foundText) {
+						text=text.replaceFirst("^.*=>[\\s]*", "");
+						text=prepareUtteranceForClassification(text);
+						if (sas == null) { sas=new HashSet<String>(); }
+						if ((lastItem!=null) && text.equals(lastItem.getFirst())) {
+							lastItem.getSecond().addAll(sas);
+						} else {
+							toReturn.add(lastItem=new Pair<String, Collection<String>>(text, sas));
+						}
+						text="";
+					} else {
+						sas=new HashSet<String>();
+					}
 				}
 			}
 		}
-		return ret;
+		return toReturn;
 	}
 
 	public static Set<String> getAllSpeechActsInTrainingData(List<TrainingDataFormat> td) {
@@ -1290,9 +1293,9 @@ public class BuildTrainingData {
 			}
 			ToolkitBase.autoLayout(headers.length,workingSheet);
 			
-			FileOutputStream out = new FileOutputStream(xlsxOutput);
-			spreadsheet.write(out);
-			out.close();
+			try (FileOutputStream out = new FileOutputStream(xlsxOutput)) {
+				spreadsheet.write(out);
+			}
 		}
 	}
 	private static Row addRowToXLSXTranscript(final TargetDialogEntry td, final Sheet workingSheet, final CellStyle style, final CellStyle boldStyle) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, InstantiationException {

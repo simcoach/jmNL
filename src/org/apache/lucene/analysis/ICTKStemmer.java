@@ -1401,17 +1401,13 @@ public class ICTKStemmer {
 
 	// If we get here, we are about to process a file
 
-	try {
-	    LineNumberReader reader = new LineNumberReader(new FileReader(Sanitizer.file(args[0])));
-
+	try (LineNumberReader reader = new LineNumberReader(new FileReader(Sanitizer.file(args[0])))) {
 	    line = reader.readLine();
 	    while (line != null) {
-		line = line.trim();
-		System.out.println(line+" "+stemmer.stem(line));
-		line = reader.readLine();
+			line = line.trim();
+			System.out.println(line+" "+stemmer.stem(line));
+			line = reader.readLine();
 	    }
-	    reader.close();
-
 	} catch (Exception e) {
 	    System.out.println("Exception while processing term ["+line+"]");
 	}

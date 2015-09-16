@@ -263,8 +263,8 @@ public class ExcelUtils {
 	}
 	
 	public static Workbook getWorkbook(String file) {
-		try {
-			return WorkbookFactory.create(new FileInputStream(file));
+		try (FileInputStream in = new FileInputStream(file)) {
+			return WorkbookFactory.create(in);
 		} catch (Exception e) {
 			logger.error(Sanitizer.log(e.getMessage()), e);
 		}
@@ -279,8 +279,8 @@ public class ExcelUtils {
 		return null;
 	}
 	public static Sheet getSpreadSheet(String file, int sheetIndex) {
-		try {
-			Workbook wb = WorkbookFactory.create(new FileInputStream(file));
+		try (FileInputStream in = new FileInputStream(file)) {
+			Workbook wb = WorkbookFactory.create(in);
 			return wb.getSheetAt(sheetIndex);
 		} catch (Exception e) {
 			logger.error(Sanitizer.log(e.getMessage()), e);
@@ -539,8 +539,9 @@ public class ExcelUtils {
 			}
 
 			ExcelUtils.autoLayout((header!=null)?header.length:2, sheet);
-			FileOutputStream out=new FileOutputStream(xlsOutputFile);
-			book.write(out);
+			try (FileOutputStream out=new FileOutputStream(xlsOutputFile)) {
+				book.write(out);
+			}
 		}
 	}
 	public static void dumpListToExcel(List<TrainingDataFormat> list,File xlsOutputFile,String sheetName,final String[] header, int key, int value) throws Exception {
@@ -556,8 +557,9 @@ public class ExcelUtils {
 			}
 
 			ExcelUtils.autoLayout((header!=null)?header.length:2, sheet);
-			FileOutputStream out=new FileOutputStream(xlsOutputFile);
-			book.write(out);
+			try (FileOutputStream out = new FileOutputStream(xlsOutputFile)) {
+				book.write(out);
+			}
 		}
 	}
 	
@@ -630,8 +632,9 @@ public class ExcelUtils {
 			}
 
 			ExcelUtils.autoLayout((header!=null)?header.length:maxC, sheet);
-			FileOutputStream out=new FileOutputStream(xlsOutputFile);
-			book.write(out);
+			try (FileOutputStream out = new FileOutputStream(xlsOutputFile)) {
+				book.write(out);
+			}
 		}
 	}
 

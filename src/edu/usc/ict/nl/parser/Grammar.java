@@ -62,59 +62,58 @@ public class Grammar {
 		nrules = 0;  		// number of rules in the grammar so far
 
 		// Open the grammar file
-		FileInputStream fstream = new FileInputStream(fname);
+		try (
+			FileInputStream fstream = new FileInputStream(fname);
 
-		// Get the object of DataInputStream
-		DataInputStream in = new DataInputStream(fstream);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			// Get the object of DataInputStream
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in))
+		) {
 
-		String strLine;
-
-		//Read File Line By Line
-		while ((strLine = br.readLine()) != null)   {				
-			if ((strLine.length()>0) && (strLine.charAt(0)!='#')) {
-				// split at white spaces
-				String[] tok = strLine.split("\\s+");
-
-				// the format is "prob lhs rhs1 rhs2..."
-				// if we have less than 3 tokens, this is not a rule
-				if(tok.length < 3) {
-					continue;
-				}
-
-				// add the grammar rule
-				GrammarRule rule=new GrammarRule(tok,nrules,chartParser);
-				if (rule.sem==null) throw new Exception("Invalid rule: "+rule+". No semantics.");
-				rules[nrules]=rule;
-
-				if (rule.getType().equals(GrammarRuleType.RE)) {
-					try {
-						terminalRE.put(Pattern.compile(rule.rhs[0]), nrules);
-					} catch(Exception e) {
-						logger.error(Sanitizer.log(e.getMessage()), e);
+			String strLine;
+	
+			//Read File Line By Line
+			while ((strLine = br.readLine()) != null)   {				
+				if ((strLine.length()>0) && (strLine.charAt(0)!='#')) {
+					// split at white spaces
+					String[] tok = strLine.split("\\s+");
+	
+					// the format is "prob lhs rhs1 rhs2..."
+					// if we have less than 3 tokens, this is not a rule
+					if(tok.length < 3) {
+						continue;
 					}
+	
+					// add the grammar rule
+					GrammarRule rule=new GrammarRule(tok,nrules,chartParser);
+					if (rule.sem==null) throw new Exception("Invalid rule: "+rule+". No semantics.");
+					rules[nrules]=rule;
+	
+					if (rule.getType().equals(GrammarRuleType.RE)) {
+						try {
+							terminalRE.put(Pattern.compile(rule.rhs[0]), nrules);
+						} catch(Exception e) {
+							logger.error(Sanitizer.log(e.getMessage()), e);
+						}
+					}
+					
+					// adds the rule number to the hashmaps.
+					Vector<Integer> tmp=gralhs.get(tok[1]);
+					if(tmp==null) gralhs.put(rule.lhs, tmp=new Vector<Integer>());
+					tmp.add(nrules);
+	
+					tmp=grarhs.get(rule.rhs[0]);
+					if (tmp==null) grarhs.put(rule.rhs[0], tmp=new Vector<Integer>());
+					tmp.add(nrules);
+	
+					// increase the rule counter
+					nrules++;
+	
+					// if we have too many rules, return -1
+					if(nrules > MAXRULENUM) throw new Exception("too many rules ("+MAXRULENUM+")");
 				}
-				
-				// adds the rule number to the hashmaps.
-				Vector<Integer> tmp=gralhs.get(tok[1]);
-				if(tmp==null) gralhs.put(rule.lhs, tmp=new Vector<Integer>());
-				tmp.add(nrules);
-
-				tmp=grarhs.get(rule.rhs[0]);
-				if (tmp==null) grarhs.put(rule.rhs[0], tmp=new Vector<Integer>());
-				tmp.add(nrules);
-
-				// increase the rule counter
-				nrules++;
-
-				// if we have too many rules, return -1
-				if(nrules > MAXRULENUM) throw new Exception("too many rules ("+MAXRULENUM+")");
 			}
 		}
-
-		//Close the input stream
-		in.close();
-
 		return 0;
 	}
 }

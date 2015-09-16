@@ -126,16 +126,16 @@ public class FSTNLU extends NLU {
 
 		allElse.removeAll(allTDSymbols);
 		allType.removeAll(allTDSymbols);
-		BufferedWriter out=new BufferedWriter(new FileWriter(type+".fsa"));
-		for(String e:allElse) {
-			out.write("0 0 "+e+" "+e+"\n");
-			out.write("1 1 "+e+" "+e+"\n");
+		try (BufferedWriter out=new BufferedWriter(new FileWriter(type+".fsa"))) {
+			for(String e:allElse) {
+				out.write("0 0 "+e+" "+e+"\n");
+				out.write("1 1 "+e+" "+e+"\n");
+			}
+			for(String e:allType) {
+				out.write("0 1 "+e+" "+e+"\n");
+			}
+			out.write("1\n");
 		}
-		for(String e:allType) {
-			out.write("0 1 "+e+" "+e+"\n");
-		}
-		out.write("1\n");
-		out.close();
 	}
 
 	@Override

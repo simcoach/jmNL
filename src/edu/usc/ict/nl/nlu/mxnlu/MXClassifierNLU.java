@@ -86,16 +86,17 @@ public class MXClassifierNLU extends NLU {
 	@Override
 	public Model readModelFileNoCache(File mf) throws Exception {
 		Model ret=null;
-		BufferedReader in=new BufferedReader(new FileReader(mf));
-		String line;
-		while((line=in.readLine())!=null) {
-			Matcher m=modelLine.matcher(line);
-			if (m.matches() && m.groupCount()==3) {
-				String l=m.group(1).replaceAll("_$","");
-				String f=m.group(2);
-				float w=Float.parseFloat(m.group(3));
-				if (ret==null) ret=new Model();
-				ret.addFeatureWeightForSA(f, l, ret.new FeatureWeight(f,w));
+		try (BufferedReader in=new BufferedReader(new FileReader(mf))) {
+			String line;
+			while((line=in.readLine())!=null) {
+				Matcher m=modelLine.matcher(line);
+				if (m.matches() && m.groupCount()==3) {
+					String l=m.group(1).replaceAll("_$","");
+					String f=m.group(2);
+					float w=Float.parseFloat(m.group(3));
+					if (ret==null) ret=new Model();
+					ret.addFeatureWeightForSA(f, l, ret.new FeatureWeight(f,w));
+				}
 			}
 		}
 		return ret;

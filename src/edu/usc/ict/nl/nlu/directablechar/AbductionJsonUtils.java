@@ -129,19 +129,19 @@ public class AbductionJsonUtils {
 		connection.setRequestProperty("Content-Length", "" + data.length);
 		connection.setUseCaches (false);
 
-		DataOutputStream wr = new DataOutputStream(connection.getOutputStream ());
-		wr.write(data);
-		wr.flush();
-		wr.close();
-		
-		BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream ()));
-	    String str;
+		try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream ())) {
+			wr.write(data);
+			wr.flush();
+		}
+
 	    StringBuffer response=new StringBuffer();
-	    while (null != ((str = input.readLine()))) {
-	    	response.append(str);
-	    }
-	    JSONObject json = new JSONObject(response.toString());
-	    return json;
+		try (BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream ()))) {
+		    String str;
+		    while (null != ((str = input.readLine()))) {
+		    	response.append(str);
+		    }
+		}
+	    return new JSONObject(response.toString());
 	}
 	public String getAbductionForPositionInJsonReply(JSONObject reply,int position) throws JSONException {
 		JSONArray utterances=getUtterances(reply);

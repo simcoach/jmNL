@@ -1,0 +1,14 @@
+*.class
+bin/chatInterface.xml
+bin/edu/usc/ict/nl/kb/parser/FormulaGrammar.jj
+*.jj
+bin/edu/usc/ict/perception/PML.xsd
+bin/NLConfigs.xml
+bin/NLUConfigs.xml
+bin/chatInterfaceVHToolkit.xml
+bin/nlModuleTesting.xml
+bin/dmVisualizer.xml
+bin/log4j.properties
+bin/left3words-wsj-0-18.tagger
+bin/names.txt
+/bin

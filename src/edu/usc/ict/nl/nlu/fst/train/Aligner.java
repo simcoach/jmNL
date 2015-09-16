@@ -66,29 +66,31 @@ public class Aligner {
 	 */
 	public List<Alignment> readAlignerOutputFile(File source,File target,File aligner) throws IOException {
 		List<Alignment> ret=null;
-		BufferedReader sr=new BufferedReader(new FileReader(source));
-		BufferedReader tr=new BufferedReader(new FileReader(target));
-		BufferedReader ar=new BufferedReader(new FileReader(aligner));
-		String s,t,a;
-		int line=1;
-		while((s=sr.readLine())!=null && (t=tr.readLine())!=null && (a=ar.readLine())!=null) {
-			if (!StringUtils.isEmptyString(s) && !StringUtils.isEmptyString(t) && !StringUtils.isEmptyString(a)) {
-				Alignment al;
-				try {
-					al = new Alignment(s,t,a);
-					if (ret==null) ret=new ArrayList<Alignment>();
-					ret.add(al);
-				} catch (Exception e) {
-					logger.error(Sanitizer.log(e.getMessage()), e);
-					logger.error(Sanitizer.log("Error while processing line "+line+" in these files:"));
-					logger.error(Sanitizer.log("source file: "+source));
-					logger.error(Sanitizer.log("target file: "+target));
-					logger.error(Sanitizer.log("aligner file: "+aligner));
+		try (
+			BufferedReader sr=new BufferedReader(new FileReader(source));
+			BufferedReader tr=new BufferedReader(new FileReader(target));
+			BufferedReader ar=new BufferedReader(new FileReader(aligner))
+		) {
+			String s,t,a;
+			int line=1;
+			while((s=sr.readLine())!=null && (t=tr.readLine())!=null && (a=ar.readLine())!=null) {
+				if (!StringUtils.isEmptyString(s) && !StringUtils.isEmptyString(t) && !StringUtils.isEmptyString(a)) {
+					Alignment al;
+					try {
+						al = new Alignment(s,t,a);
+						if (ret==null) ret=new ArrayList<Alignment>();
+						ret.add(al);
+					} catch (Exception e) {
+						logger.error(Sanitizer.log(e.getMessage()), e);
+						logger.error(Sanitizer.log("Error while processing line "+line+" in these files:"));
+						logger.error(Sanitizer.log("source file: "+source));
+						logger.error(Sanitizer.log("target file: "+target));
+						logger.error(Sanitizer.log("aligner file: "+aligner));
+					}
 				}
+				line++;
 			}
-			line++;
 		}
-		sr.close();tr.close();ar.close();
 		return ret;
 	}
 	
@@ -100,22 +102,22 @@ public class Aligner {
 	
 	protected void prepareTDforAligner(List<TrainingDataFormat> tds,File e,File f) throws Exception {
 		if (tds!=null) {
-			BufferedWriter ew=new BufferedWriter(new FileWriter(e));
-			BufferedWriter fw=new BufferedWriter(new FileWriter(f));
-			for(TrainingDataFormat td:tds) {
-				String s=td.getUtterance();
-				String l=td.getLabel();
-				//s=BuildTrainingData.untokenize(BuildTrainingData.removeStopWords(BuildTrainingData.tokenize(s)));
-				s=s.replaceAll("[-:]", "");
-				s=BuildTrainingData.untokenize(BuildTrainingData.tokenize(s));
-				l=StringUtils.cleanupSpaces(l);
-				s=s.toLowerCase();
-				l=l.toLowerCase();
-				ew.write(s+"\n");
-				fw.write(l+"\n");
+			try (BufferedWriter ew=new BufferedWriter(new FileWriter(e));
+				BufferedWriter fw=new BufferedWriter(new FileWriter(f))
+			) {
+				for(TrainingDataFormat td:tds) {
+					String s=td.getUtterance();
+					String l=td.getLabel();
+					//s=BuildTrainingData.untokenize(BuildTrainingData.removeStopWords(BuildTrainingData.tokenize(s)));
+					s=s.replaceAll("[-:]", "");
+					s=BuildTrainingData.untokenize(BuildTrainingData.tokenize(s));
+					l=StringUtils.cleanupSpaces(l);
+					s=s.toLowerCase();
+					l=l.toLowerCase();
+					ew.write(s+"\n");
+					fw.write(l+"\n");
+				}
 			}
-			ew.close();
-			fw.close();
 		}
 	}
 

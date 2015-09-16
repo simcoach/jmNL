@@ -388,9 +388,9 @@ public class HierarchicalNLU extends NLU {
 					logger.error(Sanitizer.log(nodeName+" has produced a null compressed training data."));
 				}
 			}
-			BufferedWriter out=new BufferedWriter(new FileWriter(modelFile));
-			out.write(newModelContent);
-			out.close();
+			try (BufferedWriter out=new BufferedWriter(new FileWriter(modelFile))) {
+				out.write(newModelContent);
+			}
 		}
 	}
 

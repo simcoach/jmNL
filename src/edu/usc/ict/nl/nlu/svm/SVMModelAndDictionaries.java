@@ -106,35 +106,35 @@ public class SVMModelAndDictionaries {
 	}
 	enum STATE {SVM,OUTPUTCLASSES,FEATURES,END};
 	private void loadModel(File model) throws Exception {
-		BufferedReader in=new BufferedReader(new FileReader(model));
-		String line;
-		STATE readingState=STATE.SVM;
-		while((line=in.readLine())!=null) {
-			File p=null;
-			switch (readingState) {
-			case SVM:
-				p=new File(Sanitizer.file(line));
-				this.classifier=loadSVMClassifier(p);
-				readingState=STATE.OUTPUTCLASSES;
-				break;
-			case OUTPUTCLASSES:
-				p=new File(Sanitizer.file(line));
-				this.outputClassDictionary=(Map<String, Integer>) loadObject(p);
-				this.outputClassDictionaryInverse=invertMap(outputClassDictionary);
-				readingState=STATE.FEATURES;
-				break;
-			case FEATURES:
-				p=new File(Sanitizer.file(line));
-				this.featuresDictionary=(Map<String, Integer>) loadObject(p);
-				this.featuresDictionaryInverse=invertMap(featuresDictionary);
-				readingState=STATE.END;
-				break;
-			case END:
-				break;
+		try (BufferedReader in=new BufferedReader(new FileReader(model))) {
+			String line;
+			STATE readingState=STATE.SVM;
+			while((line=in.readLine())!=null) {
+				File p=null;
+				switch (readingState) {
+				case SVM:
+					p=new File(Sanitizer.file(line));
+					this.classifier=loadSVMClassifier(p);
+					readingState=STATE.OUTPUTCLASSES;
+					break;
+				case OUTPUTCLASSES:
+					p=new File(Sanitizer.file(line));
+					this.outputClassDictionary=(Map<String, Integer>) loadObject(p);
+					this.outputClassDictionaryInverse=invertMap(outputClassDictionary);
+					readingState=STATE.FEATURES;
+					break;
+				case FEATURES:
+					p=new File(Sanitizer.file(line));
+					this.featuresDictionary=(Map<String, Integer>) loadObject(p);
+					this.featuresDictionaryInverse=invertMap(featuresDictionary);
+					readingState=STATE.END;
+					break;
+				case END:
+					break;
+				}
+				if (readingState==STATE.END) break;
 			}
-			if (readingState==STATE.END) break;
 		}
-		in.close();
 	}
 
 	public Integer getIdOfFeature(String f) {
@@ -200,15 +200,15 @@ public class SVMModelAndDictionaries {
 
 	public File convertTrainingDataToSVMFormat(List<TrainingDataFormat> tds,File output) throws Exception {
 		if (output!=null && tds!=null && outputClassDictionary!=null && featuresDictionary!=null) {
-			BufferedWriter out=new BufferedWriter(new FileWriter(output));
-			for(TrainingDataFormat td:tds) {
-				String sa=td.getLabel();
-				String text=nlu.doPreprocessingForClassify(td.getUtterance());
-				String[] features=text.split("[\\s]+");
-				String line=writeSVMLine(outputClassDictionary.get(sa),features,featuresDictionary);
-				out.write(line+"\n");
+			try (BufferedWriter out=new BufferedWriter(new FileWriter(output))) {
+				for(TrainingDataFormat td:tds) {
+					String sa=td.getLabel();
+					String text=nlu.doPreprocessingForClassify(td.getUtterance());
+					String[] features=text.split("[\\s]+");
+					String line=writeSVMLine(outputClassDictionary.get(sa),features,featuresDictionary);
+					out.write(line+"\n");
+				}
 			}
-			out.close();
 		}
 		return output;
 	}
@@ -234,73 +234,73 @@ public class SVMModelAndDictionaries {
 
 	public void save(String model) throws IOException {
 		File modelFile=new File(model);
-		BufferedWriter out=new BufferedWriter(new FileWriter(modelFile));
-		File tmp=File.createTempFile("svmModel", ".model", modelFile.getParentFile());
-		svm.svm_save_model(tmp.getAbsolutePath(),classifier);
-		out.write(tmp.getAbsolutePath()+"\n");
-		tmp=File.createTempFile("outputClassesDictionary", ".model", modelFile.getParentFile());
-		outputCenverter.toXML(outputClassDictionary, new FileWriter(tmp));
-		out.write(tmp.getAbsolutePath()+"\n");
-		tmp=File.createTempFile("featuresDictionary", ".model", modelFile.getParentFile());
-		outputCenverter.toXML(featuresDictionary, new FileWriter(tmp));
-		out.write(tmp.getAbsolutePath()+"\n");
-		out.close();
+		try (BufferedWriter out=new BufferedWriter(new FileWriter(modelFile))) {
+			File tmp=File.createTempFile("svmModel", ".model", modelFile.getParentFile());
+			svm.svm_save_model(tmp.getAbsolutePath(),classifier);
+			out.write(tmp.getAbsolutePath()+"\n");
+			tmp=File.createTempFile("outputClassesDictionary", ".model", modelFile.getParentFile());
+			outputCenverter.toXML(outputClassDictionary, new FileWriter(tmp));
+			out.write(tmp.getAbsolutePath()+"\n");
+			tmp=File.createTempFile("featuresDictionary", ".model", modelFile.getParentFile());
+			outputCenverter.toXML(featuresDictionary, new FileWriter(tmp));
+			out.write(tmp.getAbsolutePath()+"\n");
+		}
 	}
 
 	public svm_problem readSVMTrainingFile(File input) throws IOException {
-		BufferedReader fp = new BufferedReader(new FileReader(input));
-		Vector<Double> vy = new Vector<Double>();
-		Vector<svm_node[]> vx = new Vector<svm_node[]>();
-		int max_index = 0;
-
-		while(true)
-		{
-			String line = fp.readLine();
-			if(line == null) break;
-
-			StringTokenizer st = new StringTokenizer(line," \t\n\r\f:");
-
-			vy.addElement(atof(st.nextToken()));
-			int m = st.countTokens()/2;
-			svm_node[] x = new svm_node[m];
-			for(int j=0;j<m;j++)
-			{
-				x[j] = new svm_node();
-				x[j].index = atoi(st.nextToken());
-				x[j].value = atof(st.nextToken());
-			}
-			if(m>0) max_index = Math.max(max_index, x[m-1].index);
-			vx.addElement(x);
-		}
-
+		
 		svm_problem prob = new svm_problem();
-		prob.l = vy.size();
-		prob.x = new svm_node[prob.l][];
-		for(int i=0;i<prob.l;i++)
-			prob.x[i] = vx.elementAt(i);
-		prob.y = new double[prob.l];
-		for(int i=0;i<prob.l;i++)
-			prob.y[i] = vy.elementAt(i);
-
-		if(param.gamma == 0 && max_index > 0)
-			param.gamma = 1.0/max_index;
-
-		if(param.kernel_type == svm_parameter.PRECOMPUTED)
-			for(int i=0;i<prob.l;i++)
+		try (BufferedReader fp = new BufferedReader(new FileReader(input))) {
+			Vector<Double> vy = new Vector<Double>();
+			Vector<svm_node[]> vx = new Vector<svm_node[]>();
+			int max_index = 0;
+	
+			while(true)
 			{
-				if (prob.x[i][0].index != 0)
+				String line = fp.readLine();
+				if(line == null) break;
+	
+				StringTokenizer st = new StringTokenizer(line," \t\n\r\f:");
+	
+				vy.addElement(atof(st.nextToken()));
+				int m = st.countTokens()/2;
+				svm_node[] x = new svm_node[m];
+				for(int j=0;j<m;j++)
 				{
-					System.err.print("Wrong kernel matrix: first column must be 0:sample_serial_number\n");
-					System.exit(1);
+					x[j] = new svm_node();
+					x[j].index = atoi(st.nextToken());
+					x[j].value = atof(st.nextToken());
 				}
-				if ((int)prob.x[i][0].value <= 0 || (int)prob.x[i][0].value > max_index)
+				if(m>0) max_index = Math.max(max_index, x[m-1].index);
+				vx.addElement(x);
+			}
+			prob.l = vy.size();
+			prob.x = new svm_node[prob.l][];
+			for(int i=0;i<prob.l;i++)
+				prob.x[i] = vx.elementAt(i);
+			prob.y = new double[prob.l];
+			for(int i=0;i<prob.l;i++)
+				prob.y[i] = vy.elementAt(i);
+	
+			if(param.gamma == 0 && max_index > 0)
+				param.gamma = 1.0/max_index;
+	
+			if(param.kernel_type == svm_parameter.PRECOMPUTED) {
+				for(int i=0;i<prob.l;i++)
 				{
-					System.err.print("Wrong input format: sample_serial_number out of range\n");
-					System.exit(1);
+					if (prob.x[i][0].index != 0)
+					{
+						System.err.print("Wrong kernel matrix: first column must be 0:sample_serial_number\n");
+						System.exit(1);
+					}
+					if ((int)prob.x[i][0].value <= 0 || (int)prob.x[i][0].value > max_index)
+					{
+						System.err.print("Wrong input format: sample_serial_number out of range\n");
+						System.exit(1);
+					}
 				}
 			}
-
-		fp.close();
+		}
 		return prob;
 	}
 	private static int atoi(String s)

@@ -45,17 +45,17 @@ public class WordlistTopicDetection extends NLU {
 		try {
 			topics=null;
 			String line;
-			BufferedReader in=new BufferedReader(new FileReader(modelFile));
-			while((line=in.readLine())!=null) {
-				Matcher m=hierModelLine.matcher(line);
-				if (m.matches() && (m.groupCount()==2)) {
-					String topicIdentifier=m.group(1);
-					File thisNodeModelFile=new File(getConfiguration().getNLUContentRoot(),new File(m.group(2)).getName());
-					if (topics==null) topics=new ArrayList<WordlistTopicDetection.TopicMatcher>();
-					topics.add(new TopicMatcher(topicIdentifier,thisNodeModelFile));
+			try (BufferedReader in=new BufferedReader(new FileReader(modelFile))) {
+				while((line=in.readLine())!=null) {
+					Matcher m=hierModelLine.matcher(line);
+					if (m.matches() && (m.groupCount()==2)) {
+						String topicIdentifier=m.group(1);
+						File thisNodeModelFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),new File(m.group(2)).getName()));
+						if (topics==null) topics=new ArrayList<WordlistTopicDetection.TopicMatcher>();
+						topics.add(new TopicMatcher(topicIdentifier,thisNodeModelFile));
+					}
 				}
 			}
-			in.close();
 		} catch (Exception e) {
 			logger.warn("Error during hierarchical model building.",e);
 		}
@@ -73,8 +73,7 @@ public class WordlistTopicDetection extends NLU {
 		
 		public void loadPatternsFromFile(String patternFile) {
 			String line;
-			try {
-				BufferedReader in=new BufferedReader(new FileReader(patternFile));
+			try (BufferedReader in=new BufferedReader(new FileReader(patternFile))) {
 				while((line=in.readLine())!=null) {
 					List<String> ts = getTokensStrings(line);
 					m.addPattern(ts, topicID);

@@ -390,7 +390,11 @@ public abstract class DM implements DMInterface {
 			Map parametersOfSpeechAct=(Map) ev.getPayload();
 			if (parametersOfSpeechAct!=null) {
 				Object varPreferForms = parametersOfSpeechAct.get(NLBusBase.preferFormsVariableName);
-				return (varPreferForms != null && (varPreferForms.equals("yes") || masterPreferForms.equals(true))); 
+				if (varPreferForms != null) {
+					return varPreferForms.equals("yes"); 
+				} else {
+					return masterPreferForms.equals(true);
+				}
 			} else return false;
 		}
 	}

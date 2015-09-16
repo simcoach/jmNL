@@ -63,13 +63,13 @@ public class Feedback {
 	private static final Pattern questionPattern=Pattern.compile("[\\s]+name[\\s]*=[\\s]*\"[\\s]*(q[1-9]+)[\\s]*\"");
 	private Set<String> getFeedbackQuestionsInForm(File feedbackFile) throws IOException {
 		if (feedbackFile!=null) {
-			BufferedReader in=new BufferedReader(new FileReader(feedbackFile));
 			StringBuffer content=new StringBuffer();
-			String line;
-			while((line=in.readLine())!=null) {
-				content.append(line);
+			try (BufferedReader in = new BufferedReader(new FileReader(feedbackFile))) {
+				String line;
+				while((line=in.readLine())!=null) {
+					content.append(line);
+				}
 			}
-			in.close();
 			String all=content.substring(0);
 			int start=0,length=all.length();
 			Matcher m=questionPattern.matcher(all);
@@ -199,18 +199,18 @@ public class Feedback {
 	public void saveFeedback(File currentChatLogFile,Map<String, Pair<String, String>> results) throws IOException {
 		if (currentChatLogFile!=null && hasFeedback()) {
 			File ff=new File(currentChatLogFile.getAbsolutePath()+".feedback");
-			BufferedWriter out=new BufferedWriter(new FileWriter(ff));
-			if (results!=null) {
-				for(String key:results.keySet()) {
-					Pair<String, String> valueAndTitle=results.get(key);
-					String q=valueAndTitle.getSecond();
-					if (!StringUtils.isEmptyString(q)) out.write(key+"='"+q+"'\n");
-					else out.write(key+"\n");
-					out.write(valueAndTitle.getFirst()+"\n");
-					out.flush();
+			try (BufferedWriter out=new BufferedWriter(new FileWriter(ff))) {
+				if (results!=null) {
+					for(String key:results.keySet()) {
+						Pair<String, String> valueAndTitle=results.get(key);
+						String q=valueAndTitle.getSecond();
+						if (!StringUtils.isEmptyString(q)) out.write(key+"='"+q+"'\n");
+						else out.write(key+"\n");
+						out.write(valueAndTitle.getFirst()+"\n");
+						out.flush();
+					}
 				}
 			}
-			out.close();
 		}
 	}
 	
@@ -231,31 +231,32 @@ public class Feedback {
 		Map<String, Pair<String, String>> ret=null;
 		File file=new File(filename);
 		if (file.exists()) {
-			BufferedReader in=new BufferedReader(new FileReader(file));
-			String line,qID=null,qText=null,qResponse=null;
-			while((line=in.readLine())!=null) {
-				Matcher m=fileQPattern.matcher(line);
-				if (m.matches() && (m.groupCount()==2)) {
-					if (!StringUtils.isEmptyString(qID) && !StringUtils.isEmptyString(qText)) {
-						if (ret==null) ret=new HashMap<String, Pair<String,String>>();
-						ret.put(qID,new Pair<String, String>(qResponse, qText));
-					}
-					qResponse=null;
-					qID=m.group(1);
-					qText=m.group(2);
-				} else {
-					if (!StringUtils.isEmptyString(qID) && !StringUtils.isEmptyString(qText)) {
-						qResponse=(qResponse!=null)?qResponse+line:line;
+			try (BufferedReader in=new BufferedReader(new FileReader(file))) {
+				String line,qID=null,qText=null,qResponse=null;
+				while((line=in.readLine())!=null) {
+					Matcher m=fileQPattern.matcher(line);
+					if (m.matches() && (m.groupCount()==2)) {
+						if (!StringUtils.isEmptyString(qID) && !StringUtils.isEmptyString(qText)) {
+							if (ret==null) ret=new HashMap<String, Pair<String,String>>();
+							ret.put(qID,new Pair<String, String>(qResponse, qText));
+						}
+						qResponse=null;
+						qID=m.group(1);
+						qText=m.group(2);
 					} else {
-						qID=null;
-						qText=null;
+						if (!StringUtils.isEmptyString(qID) && !StringUtils.isEmptyString(qText)) {
+							qResponse=(qResponse!=null)?qResponse+line:line;
+						} else {
+							qID=null;
+							qText=null;
+						}
 					}
 				}
-			}
-			// write last question
-			if (!StringUtils.isEmptyString(qID) && !StringUtils.isEmptyString(qText)) {
-				if (ret==null) ret=new HashMap<String, Pair<String,String>>();
-				ret.put(qID,new Pair<String, String>(qResponse, qText));
+				// write last question
+				if (!StringUtils.isEmptyString(qID) && !StringUtils.isEmptyString(qText)) {
+					if (ret==null) ret=new HashMap<String, Pair<String,String>>();
+					ret.put(qID,new Pair<String, String>(qResponse, qText));
+				}
 			}
 		}
 		return ret;

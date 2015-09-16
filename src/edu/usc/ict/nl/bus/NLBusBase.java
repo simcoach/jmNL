@@ -562,9 +562,10 @@ public abstract class NLBusBase implements NLBusInterface {
 	public synchronized NLGInterface getNlg(Long sid,boolean createIfNotThereAlready) throws Exception {
 		NLG nlg=session2NLG.get(sid);
 		String characterName = getCharacterName4Session(sid);
-		boolean characterOK=nlg==null || nlg.getConfiguration().getDefaultCharacter().equals(characterName);
+		boolean isNlgNull = (nlg == null);
+		boolean characterOK= isNlgNull || nlg.getConfiguration().getDefaultCharacter().equals(characterName);
 		if (!characterOK) logger.error(Sanitizer.log("NLG for session "+sid+" associated to character '"+nlg.getConfiguration().getDefaultCharacter()+"' but that session is for character '"+characterName+"'."));
-		if (nlg!=null && characterOK) return nlg;
+		if (!isNlgNull&& characterOK) return nlg;
 		else if (characterOK || createIfNotThereAlready) {
 			NLBusConfig config=(NLBusConfig) getConfiguration().clone();
 			config.setDefaultCharacter(characterName);

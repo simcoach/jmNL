@@ -479,10 +479,12 @@ public class MXChartClassifierNLU extends NLU {
 		
 		for(PartialClassification el:finalPairings.keySet()) {
 			Pair<PartialClassification, Float> bestMatch=finalPairings.get(el);
-			NLUOutput oSA=(bestMatch!=null)?bestMatch.getFirst().getTopResult():null;
+			boolean isBestMatchNull = (bestMatch == null);
+			NLUOutput oSA=(!isBestMatchNull)?bestMatch.getFirst().getTopResult():null;
+			boolean isOsaNull = (oSA == null);
 			NLUOutput sa=el.getTopResult();
-			if ((sa.getId()==null && oSA==null) || ((oSA!=null) && (sa.getId()!=null) && (sa.getId().equals(oSA.getId())))) {
-				accuracy+=(bestMatch!=null)?bestMatch.getSecond():1;
+			if ((sa.getId()==null && isOsaNull) || (!isOsaNull && (sa.getId()!=null) && (sa.getId().equals(oSA.getId())))) {
+				accuracy+=(!isBestMatchNull)?bestMatch.getSecond():1;
 				edgeDiffs.addMeasure(getExtremesDiffs(el,bestMatch.getFirst()));
 				positiveMatches++;
 			}

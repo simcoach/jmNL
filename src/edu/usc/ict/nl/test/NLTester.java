@@ -55,8 +55,14 @@ public class NLTester {
 	}
 	public boolean batchDM(Long sid,String inputFile,String nluModel, boolean fakeNLU) throws Exception {
 		String outputFile=inputFile+".output";
-		BufferedWriter out=new BufferedWriter(new FileWriter(outputFile));
-		return batchDM(sid, new BufferedReader(new FileReader(inputFile)), nluModel, fakeNLU,out);
+		try (
+			BufferedWriter out = new BufferedWriter(new FileWriter(outputFile));
+			BufferedReader in = new BufferedReader(new FileReader(inputFile));
+		) {
+			return batchDM(sid, in, nluModel, fakeNLU,out);
+		} catch (Exception ex) {
+			throw ex;
+		}
 	}
 	public boolean batchDM(Long sid,BufferedReader inp,String nluModel, boolean fakeNLU,BufferedWriter out) throws Exception {
 		boolean success=true;

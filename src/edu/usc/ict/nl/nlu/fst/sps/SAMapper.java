@@ -128,54 +128,54 @@ public class SAMapper {
 		loadMapperModel(new File(config.getSpsMapperModelFile()));
 	}
 	public void loadMapperModel(File model) throws Exception {
-		BufferedReader in=new BufferedReader(new FileReader(model));
-		String line;
-		READSTATE state=READSTATE.UTTERANCE;
-		String u=null,s=null,f=null;
 		int errors=0,total=0;
-		while((line=in.readLine())!=null) {
-			switch (state) {
-			case UTTERANCE:
-				u=line;
-				state=READSTATE.SPEECHACT;
-				break;
-			case SPEECHACT:
-				s=line;
-				state=READSTATE.FSTOUTPUT;
-				break;
-			case FSTOUTPUT:
-				f=line;
-				if (StringUtils.isEmptyString(u) || StringUtils.isEmptyString(s) || StringUtils.isEmptyString(f)) {
+		try (BufferedReader in=new BufferedReader(new FileReader(model))) {
+			String line;
+			READSTATE state=READSTATE.UTTERANCE;
+			String u=null,s=null,f=null;
+			while((line=in.readLine())!=null) {
+				switch (state) {
+				case UTTERANCE:
+					u=line;
+					state=READSTATE.SPEECHACT;
+					break;
+				case SPEECHACT:
+					s=line;
+					state=READSTATE.FSTOUTPUT;
+					break;
+				case FSTOUTPUT:
+					f=line;
+					if (StringUtils.isEmptyString(u) || StringUtils.isEmptyString(s) || StringUtils.isEmptyString(f)) {
+						in.close();
+						throw new Exception("empty utterance, sa or fst nlu output.");
+					}
+					List<Map<String, String>> fstNluOutputs=FSTNLUOutput.decomposeNLUOutput(f);
+					boolean error=addAllMappings(u,s,fstNluOutputs);
+					if (error) errors++;
+					total++;
+					state=READSTATE.UTTERANCE;
+					u=s=f=null;
+					break;
+				default:
 					in.close();
-					throw new Exception("empty utterance, sa or fst nlu output.");
+					throw new Exception("invalid state");
 				}
-				List<Map<String, String>> fstNluOutputs=FSTNLUOutput.decomposeNLUOutput(f);
-				boolean error=addAllMappings(u,s,fstNluOutputs);
-				if (error) errors++;
-				total++;
-				state=READSTATE.UTTERANCE;
-				u=s=f=null;
-				break;
-			default:
-				in.close();
-				throw new Exception("invalid state");
 			}
 		}
-		in.close();
 		if (errors>0) logger.error(errors+"/"+total+" error(s) loading mapper model.");
 		logger.info("finished loading mapper model");
 	}
 	public static void saveMapperModel(List<Triple<String, String, String>> mappingInfo, File model) throws IOException {
-		BufferedWriter out=new BufferedWriter(new FileWriter(model));
-		for(Triple<String, String, String> info:mappingInfo) {
-			String utterance=info.getFirst();
-			String spsSA=info.getSecond();
-			String fstNLUOutputs=info.getThird();
-			out.write(utterance+"\n");
-			out.write(spsSA+"\n");
-			out.write(fstNLUOutputs+"\n");
+		try (BufferedWriter out=new BufferedWriter(new FileWriter(model))) {
+			for(Triple<String, String, String> info:mappingInfo) {
+				String utterance=info.getFirst();
+				String spsSA=info.getSecond();
+				String fstNLUOutputs=info.getThird();
+				out.write(utterance+"\n");
+				out.write(spsSA+"\n");
+				out.write(fstNLUOutputs+"\n");
+			}
 		}
-		out.close();
 	}
 	public static List<Triple<String,String,String>> buildMappingInfo(SPSFSTNLU spsfstnlu, List<TrainingDataFormat> tds) {
 		List<Triple<String,String,String>> ret=null;

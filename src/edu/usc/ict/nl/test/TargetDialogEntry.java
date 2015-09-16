@@ -187,8 +187,11 @@ public class TargetDialogEntry {
 	}
 
 	public static List<TargetDialogEntry> readTargetDialog(String inputFile,String lowConfidenceEventName) throws Exception {
-		BufferedReader inp=new BufferedReader(new FileReader(inputFile));
-		return readTargetDialog(inp,lowConfidenceEventName);
+		ArrayList<TargetDialogEntry> toReturn = null;
+		try (BufferedReader inp=new BufferedReader(new FileReader(inputFile))) {
+			toReturn = readTargetDialog(inp,lowConfidenceEventName);
+		}
+		return toReturn;
 	}
 	public static ArrayList<TargetDialogEntry> readTargetDialog(BufferedReader inp,String lowConfidenceEventName) throws Exception {
 		String line;

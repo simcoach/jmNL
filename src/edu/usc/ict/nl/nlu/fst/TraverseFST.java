@@ -84,22 +84,22 @@ public class TraverseFST {
 	
 	public static Map<Integer,String> openSymbols(File symbols) throws Exception {
 		Map<Integer,String> ret=new HashMap<Integer, String>();
-		BufferedReader in=new BufferedReader(new FileReader(symbols));
-		String line;
-		int lineCount=1;
-		while((line=in.readLine())!=null) {
-			String[] portions=line.split("[\\s]+");
-			if (portions!=null && portions.length==2) {
-				int symID=Integer.parseInt(portions[1]);
-				if (ret==null) ret=new HashMap<Integer, String>();
-				ret.put(symID,portions[0]);
-			} else {
-				in.close();
-				throw new Exception("error in line "+lineCount);
+		try (BufferedReader in=new BufferedReader(new FileReader(symbols))) {
+			String line;
+			int lineCount=1;
+			while((line=in.readLine())!=null) {
+				String[] portions=line.split("[\\s]+");
+				if (portions!=null && portions.length==2) {
+					int symID=Integer.parseInt(portions[1]);
+					if (ret==null) ret=new HashMap<Integer, String>();
+					ret.put(symID,portions[0]);
+				} else {
+					in.close();
+					throw new Exception("error in line "+lineCount);
+				}
+				lineCount++;
 			}
-			lineCount++;
 		}
-		in.close();
 		return ret;
 	}
 	
@@ -118,40 +118,41 @@ public class TraverseFST {
 		Set<Node> notInit=new HashSet<Node>();
 		Map<Integer,String> iSyms=openSymbols(inputSymbols);
 		Map<Integer,String> oSyms=openSymbols(outputSymbols);
-		BufferedReader in=new BufferedReader(fst);
-		String line;
-		int lineCount=1;
-		while((line=in.readLine())!=null) {
-			Matcher m=transducerWithWeights.matcher(line);
-			Matcher fm=finalWithWeights.matcher(line);
-			if (m.matches()) {
-				String source=m.group(1),target=m.group(2);
-				String consume=resolveSymbol(m.group(3),iSyms);
-				String produce=resolveSymbol(m.group(6),oSyms);
-				float w=0;
-				if(m.group(9)!=null)
-					w=Float.parseFloat(m.group(9));
-				Node sn=nodes.get(source),tn=nodes.get(target);
-				if (sn==null) nodes.put(source, sn=new Node(source));
-				if (tn==null) nodes.put(target, tn=new Node(target));
-				notInit.add(tn);
-				Edge e=new Edge();
-				e.setSource(sn);
-				e.setTarget(tn);
-				e.setConsume(consume);
-				e.setProduce(produce);
-				e.setWeight(new Rational(w));
-				sn.addEdge(e, false, false);
-			} else if (fm.matches()) {
-				String source=fm.group(1);
-				float w=0;
-				if(fm.group(2)!=null)
-					w=Float.parseFloat(fm.group(2));
-				Node sn=nodes.get(source);
-				if (sn==null) nodes.put(source, sn=new Node(source));
-				sn.setWeight(new Rational(w));
-			} else throw new Exception("error in line '"+line+"'.");
-			lineCount++;
+		try (BufferedReader in=new BufferedReader(fst)) {
+			String line;
+			int lineCount=1;
+			while((line=in.readLine())!=null) {
+				Matcher m=transducerWithWeights.matcher(line);
+				Matcher fm=finalWithWeights.matcher(line);
+				if (m.matches()) {
+					String source=m.group(1),target=m.group(2);
+					String consume=resolveSymbol(m.group(3),iSyms);
+					String produce=resolveSymbol(m.group(6),oSyms);
+					float w=0;
+					if(m.group(9)!=null)
+						w=Float.parseFloat(m.group(9));
+					Node sn=nodes.get(source),tn=nodes.get(target);
+					if (sn==null) nodes.put(source, sn=new Node(source));
+					if (tn==null) nodes.put(target, tn=new Node(target));
+					notInit.add(tn);
+					Edge e=new Edge();
+					e.setSource(sn);
+					e.setTarget(tn);
+					e.setConsume(consume);
+					e.setProduce(produce);
+					e.setWeight(new Rational(w));
+					sn.addEdge(e, false, false);
+				} else if (fm.matches()) {
+					String source=fm.group(1);
+					float w=0;
+					if(fm.group(2)!=null)
+						w=Float.parseFloat(fm.group(2));
+					Node sn=nodes.get(source);
+					if (sn==null) nodes.put(source, sn=new Node(source));
+					sn.setWeight(new Rational(w));
+				} else throw new Exception("error in line '"+line+"'.");
+				lineCount++;
+			}
 		}
 		Collection<Node> init = nodes.values();
 		init.removeAll(notInit);

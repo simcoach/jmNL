@@ -179,18 +179,18 @@ public abstract class DialogueKB extends Node implements DialogueKBInterface {
 	public Collection<DialogueOperatorEffect> dumpKB(File dumpFile)	throws Exception {
 		Collection<DialogueOperatorEffect> content=dumpKB();
 		if (dumpFile!=null && content!=null) {
-			BufferedWriter out=new BufferedWriter(new FileWriter(dumpFile));
-			out.write("<"+XMLConstants.INITISID+">\n");
-			for(DialogueOperatorEffect e:content) {
-				VariableProperties ps=e.getAssignmentProperties();
-				if (ps.getProperty(PROPERTY.PERSISTENT)) {
-					out.write(e.toString(false,XMLConstants.LOADISID)+"\n");
-				} else {
-					if (logger.isDebugEnabled()) logger.debug("skipping saving variable '"+e.getAssignedVariable()+"' as it is not persistent.");
+			try (BufferedWriter out=new BufferedWriter(new FileWriter(dumpFile))) {
+				out.write("<"+XMLConstants.INITISID+">\n");
+				for(DialogueOperatorEffect e:content) {
+					VariableProperties ps=e.getAssignmentProperties();
+					if (ps.getProperty(PROPERTY.PERSISTENT)) {
+						out.write(e.toString(false,XMLConstants.LOADISID)+"\n");
+					} else {
+						if (logger.isDebugEnabled()) logger.debug("skipping saving variable '"+e.getAssignedVariable()+"' as it is not persistent.");
+					}
 				}
+				out.write("</"+XMLConstants.INITISID+">\n");
 			}
-			out.write("</"+XMLConstants.INITISID+">\n");
-			out.close();
 		}
 		return content;
 	}
