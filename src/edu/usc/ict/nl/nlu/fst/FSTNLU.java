@@ -185,7 +185,7 @@ public class FSTNLU extends NLU {
 	
 	public AlignmentSummary readAlignerInfo() throws Exception {
 		NLUConfig c = getConfiguration();
-		Aligner a=new Aligner(new File(FileUtil.path(c.getNLUContentRoot())));
+		Aligner a=new Aligner(new File(Sanitizer.file(c.getNLUContentRoot())));
 		List<Alignment> as = a.readAlignerOutputFile();
 		AlignmentSummary asum=new AlignmentSummary(as);
 		return asum;
