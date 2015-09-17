@@ -117,8 +117,8 @@ public class MXClassifierNLU extends NLU {
 		return nlup;
 	}
 	public NLUProcess startMXNLUProcessFromConfig(NLUConfig config) throws Exception {
-		new File(Sanitizer.file(getExeName(config))).setExecutable(true);
-		File model=new File(Sanitizer.file(config.getNluModelFile()));
+		new File(getExeName(config)).setExecutable(true);
+		File model=new File(config.getNluModelFile());
 		if (!model.exists()) {
 			logger.warn("no model found, retraining...");
 			boolean startTrainingNLUP=getNLUProcess()==null;
@@ -317,8 +317,8 @@ public class MXClassifierNLU extends NLU {
 	public void train(File trainingFile, File modelFile) throws Exception {
 		BuildTrainingData btd=getBTD();
 		Integer maximumNumberOfLabels=getConfiguration().getMaximumNumberOfLabels();
-		if (!trainingFile.isAbsolute()) trainingFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),trainingFile.getPath()));
-		if (!modelFile.isAbsolute()) modelFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),modelFile.getPath()));
+		if (!trainingFile.isAbsolute()) trainingFile=new File(getConfiguration().getNLUContentRoot(),trainingFile.getPath());
+		if (!modelFile.isAbsolute()) modelFile=new File(getConfiguration().getNLUContentRoot(),modelFile.getPath());
 		List<TrainingDataFormat> td =btd.buildTrainingDataFromNLUFormatFile(trainingFile);
 		if (td!=null && !td.isEmpty()) {
 			Set<String> sas = BuildTrainingData.getAllSpeechActsInTrainingData(td);
@@ -341,14 +341,14 @@ public class MXClassifierNLU extends NLU {
 		if (maximumNumberOfLabels!=null && sas.size()>maximumNumberOfLabels) logger.error(Sanitizer.log("skipping training because too many labels ("+sas.size()+">"+maximumNumberOfLabels+") in training data"));
 		else {
 			NLUConfig config=getConfiguration();
-			trainNLUOnThisData(td, new File(Sanitizer.file(config.getNluTrainingFile())), model);
+			trainNLUOnThisData(td, new File(config.getNluTrainingFile()), model);
 		}
 	}
 
 	@Override
 	public PerformanceResult test(File testingFile, File modelFile,boolean printErrors) throws Exception {
-		if (!testingFile.isAbsolute()) testingFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),testingFile.getPath()));
-		if (!modelFile.isAbsolute()) modelFile=new File(Sanitizer.file(getConfiguration().getNLUContentRoot(),modelFile.getPath()));
+		if (!testingFile.isAbsolute()) testingFile=new File(getConfiguration().getNLUContentRoot(),testingFile.getPath());
+		if (!modelFile.isAbsolute()) modelFile=new File(getConfiguration().getNLUContentRoot(),modelFile.getPath());
 		BuildTrainingData btd=getBTD();
 		List<TrainingDataFormat> td=btd.buildTrainingDataFromNLUFormatFile(testingFile);
 		return testNLUOnThisData(td, modelFile, printErrors);

@@ -135,7 +135,7 @@ public class NLUConfig extends NLConfig {
 		if (!StringUtils.isEmptyString(forcedContentRoot)) 
 			return FileUtil.path(forcedContentRoot+File.separator);
 		else 
-			return (nlBusConfig!=null)?FileUtil.path(nlBusConfig.getCharacterContentRoot()+File.separator+nluDir+File.separator):"";
+			return (nlBusConfig!=null)?nlBusConfig.getCharacterContentRoot()+File.separator+nluDir+File.separator:"";
 	}
 	/** NLU model file name */
 	public String getNluModelFile() { return FileUtil.path(getNLUContentRoot()+nluModelFile);}
@@ -151,9 +151,9 @@ public class NLUConfig extends NLConfig {
 	public boolean getUseSystemFormsToTrainNLU() {return this.useSystemFormsToTrainNLU;}
 	public void setUseSystemFormsToTrainNLU(boolean useForms) {this.useSystemFormsToTrainNLU=useForms;}
 	public String getUserUtterances() {
-		return FileUtil.path((nlBusConfig != null)
-			? nlBusConfig.getXLSXContentRoot() + userUtterancesFile
-			: getNLUContentRoot() + userUtterancesFile);
+		if (nlBusConfig!=null)
+			return nlBusConfig.getXLSXContentRoot()+userUtterancesFile;
+		else return getNLUContentRoot()+userUtterancesFile;
 	}
 	public void setUserUtterances(String file) {userUtterancesFile = removeAbsolutePath(file);}
 	public String getSystemForms() {return (nlBusConfig!=null)?nlBusConfig.getSystemForms():null;}
@@ -231,9 +231,9 @@ public class NLUConfig extends NLConfig {
 	public String getStemmerClass() {return this.stemmerClass;}
 	public void setStemmerClass(String sc) {this.stemmerClass=sc;}
 
-	public String getFstInputSymbols() {return FileUtil.path(getNLUContentRoot()+fstInputSymbols);}
+	public String getFstInputSymbols() {return getNLUContentRoot()+fstInputSymbols;}
 	public void setFstInputSymbols(String fstInputSymbols) {this.fstInputSymbols = removeAbsolutePath(fstInputSymbols);}
-	public String getFstOutputSymbols() {return FileUtil.path(getNLUContentRoot()+fstOutputSymbols);}
+	public String getFstOutputSymbols() {return getNLUContentRoot()+fstOutputSymbols;}
 	public void setFstOutputSymbols(String fstOutputSymbols) {this.fstOutputSymbols = removeAbsolutePath(fstOutputSymbols);}
 	public String[] getRunningFstCommand() {return runningFstCommand;}
 	public void setRunningFstCommand(String[] fstCommand) {this.runningFstCommand = fstCommand;}

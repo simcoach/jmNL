@@ -13,7 +13,6 @@ import edu.usc.ict.nl.nlu.TrainingDataFormat;
 import edu.usc.ict.nl.nlu.fst.sps.SAMapper;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
-import edu.usc.ict.nl.utils.Sanitizer;
 
 
 public class SPSstage1OnlyTest {
@@ -48,11 +47,11 @@ public class SPSstage1OnlyTest {
 	private static NLU train() throws Exception {
 		NLU nlu = createNLU();
 		NLUConfig config = nlu.getConfiguration();
-		List<TrainingDataFormat> tds = BuildTrainingData.extractTrainingDataFromExcel(new File(Sanitizer.file(config.getUserUtterances())), 0, 4, 5);
-		nlu.train(tds, new File(Sanitizer.file(config.getNluModelFile())));
+		List<TrainingDataFormat> tds = BuildTrainingData.extractTrainingDataFromExcel(new File(config.getUserUtterances()), 0, 4, 5);
+		nlu.train(tds, new File(config.getNluModelFile()));
 		nlu.kill();
-		nlu.loadModel(new File(Sanitizer.file(config.getNluModelFile())));
-		PerformanceResult p1 = nlu.test(tds, new File(Sanitizer.file(config.getNluModelFile())), false);
+		nlu.loadModel(new File(config.getNluModelFile()));
+		PerformanceResult p1 = nlu.test(tds, new File(config.getNluModelFile()), false);
 		System.out.println(p1);
 		return nlu;
 	}

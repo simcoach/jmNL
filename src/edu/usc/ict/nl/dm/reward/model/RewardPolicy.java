@@ -227,7 +227,6 @@ public class RewardPolicy {
 				} else if (isInitNode(c)) {
 					DialogueOperatorEffect eff=null;
 					try {
-<<<<<<< HEAD
 						eff=DialogueOperatorEffect.parse(getInitNodeValue(childAtt));
 						if (eff!=null && eff.isAssignment()) {
 							Boolean hidden=SpecialVar.getIsHidden(childAtt);
@@ -238,10 +237,6 @@ public class RewardPolicy {
 							if (readOnly!=null) eff.setAssignmentProperty(PROPERTY.READONLY, readOnly);
 						}
 					} catch (Exception e) {logger.error(Sanitizer.log(e.getMessage()), e);}
-=======
-						eff=DialogueOperatorEffect.parse(childAtt);
-					} catch (Exception e) {e.printStackTrace();}
->>>>>>> fmorbini/master
 					if (eff!=null) {
 						if (initIS==null) initIS=new ArrayList<DialogueOperatorEffect>();
 						initIS.add(eff);

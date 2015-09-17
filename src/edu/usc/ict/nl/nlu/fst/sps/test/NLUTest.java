@@ -23,32 +23,33 @@ import edu.usc.ict.nl.nlu.fst.TraverseFST;
 import edu.usc.ict.nl.nlu.fst.sps.SAMapper;
 import edu.usc.ict.nl.nlu.fst.sps.SPSFSTNLU;
 import edu.usc.ict.nl.nlu.fst.train.Aligner;
+import edu.usc.ict.nl.nlu.fst.train.Alignment;
 import edu.usc.ict.nl.nlu.fst.train.AlignmentSummary;
+import edu.usc.ict.nl.nlu.fst.train.generalizer.GeneralizedAnnotation;
+import edu.usc.ict.nl.nlu.fst.train.generalizer.TDGeneralizerAndLexiconBuilder;
 import edu.usc.ict.nl.nlu.multi.MultiNLU;
 import edu.usc.ict.nl.util.FunctionalLibrary;
 import edu.usc.ict.nl.util.Pair;
 import edu.usc.ict.nl.util.PerformanceResult;
 import edu.usc.ict.nl.util.StringUtils;
 import edu.usc.ict.nl.utils.ExcelUtils;
-import edu.usc.ict.nl.utils.FileUtil;
-import edu.usc.ict.nl.utils.Sanitizer;
 
 public class NLUTest extends FSTNLU {
 
-	public static final File hpi=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\hpi-social-trainingdata.xlsx"));
-	public static final File mh=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\mh-trainingdata.xlsx"));
-	//private static final File ros=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\ros-trainingdata.xlsx"));
-	public static final File ros=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\NLU_Step1andStep3_ROS-to-13-values.xlsx"));
-	public static final File ros1=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-1.xlsx"));
-	public static final File ros2=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-2.xlsx"));
-	public static final File ros3=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-3.xlsx"));
-	public static final File ros5=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-5.xlsx"));
-	public static final File ros6=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-6.xlsx"));
-	public static final File ros7=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-7.xlsx"));
-	public static final File ros9=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-9.xlsx"));
+	public static final File hpi=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\hpi-social-trainingdata.xlsx");
+	public static final File mh=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\mh-trainingdata.xlsx");
+	//private static final File ros=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\ros-trainingdata.xlsx");
+	public static final File ros=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\raw-training-data\\NLU_Step1andStep3_ROS-to-13-values.xlsx");
+	public static final File ros1=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-1.xlsx");
+	public static final File ros2=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-2.xlsx");
+	public static final File ros3=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-3.xlsx");
+	public static final File ros5=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-5.xlsx");
+	public static final File ros6=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-6.xlsx");
+	public static final File ros7=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-7.xlsx");
+	public static final File ros9=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\content\\ros-9.xlsx");
 	
-	public static final File testFile=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\annotation\\output.xlsx"));
-	public static final File testFile2=new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\annotation\\output-expor.xlsx"));
+	public static final File testFile=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\annotation\\output.xlsx");
+	public static final File testFile2=new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\annotation\\output-expor.xlsx");
 
 	public NLUTest(NLUConfig c) throws Exception {
 		super(c);
@@ -69,7 +70,7 @@ public class NLUTest extends FSTNLU {
 			System.out.println("stage 2: "+uu);
 //			List<TrainingDataFormat> tds = BuildTrainingData.extractTrainingDataFromExcel(new File(uu), 0, 0, 2);
 			Map<Integer, String> taxonomySAs = ExcelUtils.extractRowAndThisColumn(uu, 0, 0);
-			List<TrainingDataFormat> tds=Aligner.getTrainingDataFromGoogle(new File(Sanitizer.file(uu)), 0, 2, 3, 11, 1, -1,taxonomySAs);
+			List<TrainingDataFormat> tds=Aligner.getTrainingDataFromGoogle(new File(uu), 0, 2, 3, 11, 1, -1,taxonomySAs);
 			PerformanceResult p=new PerformanceResult();
 			for(TrainingDataFormat td:tds) {
 				List<FSTNLUOutput> rawr = ((SPSFSTNLU)nlu1).getRawNLUOutput(td.getUtterance(), null, 1);
@@ -90,7 +91,7 @@ public class NLUTest extends FSTNLU {
 			nlu1 = inlu.get("stage1");
 			uu=nlu1.getConfiguration().getUserUtterances();
 			System.out.println("stage 1: "+uu);
-			tds = BuildTrainingData.extractTrainingDataFromExcel(new File(Sanitizer.file(uu)), 0, 4, 5);
+			tds = BuildTrainingData.extractTrainingDataFromExcel(new File(uu), 0, 4, 5);
 			p = nlu1.test(tds, null, false);
 			System.out.println("stage 1: "+p);
 			break;
@@ -242,10 +243,10 @@ ERROR 15:29:07.574 [main           ] [NLU                      ] 'do you have ni
 		tmp2.setNluConfig(config2);
 		NLU nlu2=init(config2);
 		
-		File model=new File(Sanitizer.file(config.getNluModelFile()));
-		File model2=new File(Sanitizer.file(config2.getNluModelFile()));
+		File model=new File(config.getNluModelFile());
+		File model2=new File(config2.getNluModelFile());
 		
-		File u=new File(Sanitizer.file(config.getUserUtterances())); // this file contains both the new nlu annotation and the ontology single label.
+		File u=new File(config.getUserUtterances()); // this file contains both the new nlu annotation and the ontology single label.
 		logger.info("preparing training data for aligner");
 		List<TrainingDataFormat> itds = Aligner.extractTrainingDataFromSingleStep1and3GoogleXLSXForSPS(u);
 		Set<String> sas = BuildTrainingData.getAllSpeechActsInTrainingData(itds);
@@ -330,7 +331,8 @@ ERROR 15:29:07.574 [main           ] [NLU                      ] 'do you have ni
 		NLU nlu=init(config);
 		
 		nlu.retrain(ros1,ros2,ros3,ros5,ros6,ros7);
-		nlu.loadModel(new File(Sanitizer.file(nlu.getConfiguration().getNluModelFile())));
+		nlu.loadModel(new File(nlu.getConfiguration().getNluModelFile()));
+		
 		
 		List<TrainingDataFormat> test = Aligner.extractTrainingDataFromSingleStep1and3GoogleXLSXForSPS(ros9);
 		for(TrainingDataFormat td:test) td.setLabel(SAMapper.convertSA(td.getId()));
@@ -342,7 +344,7 @@ ERROR 15:29:07.574 [main           ] [NLU                      ] 'do you have ni
 		nlu=init(config);
 
 		nlu.retrain(ros1,ros2,ros3,ros5,ros6,ros7);
-		nlu.loadModel(new File(Sanitizer.file(nlu.getConfiguration().getNluModelFile())));
+		nlu.loadModel(new File(nlu.getConfiguration().getNluModelFile()));
 
 		PerformanceResult p2 = nlu.test(test, null, false);
 		System.out.println(p2);

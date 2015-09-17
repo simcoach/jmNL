@@ -26,11 +26,17 @@ public interface NLBusInterface extends DMEventsListenerInterface,ExternalListen
 	void refreshPolicyForCharacter(String characterName) throws Exception;
 
 	/**
-	 * is save is true, then it saves the current is to a file. If is false it does everything but saving to file (setting some is variables)
+	 * saves in the provided file the current information state of the given session.
 	 * @param sid
-	 * @param save
+	 * @param is
 	 * @throws Exception
 	 */
-	public void saveInformationStateForSession(Long sid,boolean save) throws Exception;
+	public void saveInformationStateForSession(Long sid,File is) throws Exception;
+	/**
+	 * imports the values saved in the provided file into the information state for the given session.
+	 * @param sid
+	 * @param is
+	 * @throws Exception
+	 */
 	public void loadInformationStateForSession(Long sid,File is) throws Exception;
 }

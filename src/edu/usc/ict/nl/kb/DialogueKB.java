@@ -210,15 +210,10 @@ public abstract class DialogueKB extends Node implements DialogueKBInterface {
 				if (RewardPolicy.isInitNode(c)) {
 					DialogueOperatorEffect eff=null;
 					try {
-<<<<<<< HEAD
 						eff=DialogueOperatorEffect.parse(RewardPolicy.getInitNodeValue(childAtt));
 					} catch (Exception e) {
 						logger.error(Sanitizer.log(e.getMessage()), e);
 					}
-=======
-						eff=DialogueOperatorEffect.parse(childAtt);
-					} catch (Exception e) {e.printStackTrace();}
->>>>>>> fmorbini/master
 					if (eff!=null) {
 						if (ret==null) ret=new ArrayList<DialogueOperatorEffect>();
 						ret.add(eff);
@@ -247,9 +242,9 @@ public abstract class DialogueKB extends Node implements DialogueKBInterface {
 		else return VariableProperties.defaultProperties;
 	}
 	@Override
-	public void setPropertyForVar(String varName, PROPERTY p, Boolean value) {
+	public void setPropertyForVar(String varName, PROPERTY p, boolean value) {
 		varName=normalizeNames(varName);
-		if (value!=null) {
+		if (!VariableProperties.isDefault(p, value)) {
 			if (ps==null) ps=new HashMap<String, VariableProperties>();
 			VariableProperties vps=ps.get(varName);
 			if (vps==null) ps.put(varName, vps=new VariableProperties());

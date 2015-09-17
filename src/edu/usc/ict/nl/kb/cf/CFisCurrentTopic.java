@@ -26,6 +26,7 @@ public class CFisCurrentTopic implements CustomFunctionInterface {
 	public Boolean eval(DialogueKBFormula f, DialogueKBInterface is,
 			boolean forSimplification,EvalContext context) throws Exception {
 		if (forSimplification) return null;
+		// returns true is the argument has a value different from NULL, otherwise returns false.
 		DialogueKBFormula arg = (DialogueKBFormula) f.getFirstChild();
 		Object result=is.evaluate(arg,context);
 		String topic=null;

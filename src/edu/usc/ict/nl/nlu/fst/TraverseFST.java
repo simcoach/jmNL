@@ -33,7 +33,6 @@ import edu.usc.ict.nl.util.StreamGobbler;
 import edu.usc.ict.nl.util.graph.Edge;
 import edu.usc.ict.nl.util.graph.GraphElement;
 import edu.usc.ict.nl.util.graph.Node;
-import edu.usc.ict.nl.utils.FileUtil;
 import edu.usc.ict.nl.utils.LogConfig;
 
 public class TraverseFST {
@@ -54,9 +53,9 @@ public class TraverseFST {
 	}
 
 	public TraverseFST() throws Exception {
-		this(new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\nlu\\input.syms")),
-				new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\nlu\\output.syms")),
-				new File(FileUtil.path("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\nlu\\alignments.fst")),
+		this(new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\nlu\\input.syms"),
+				new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\nlu\\output.syms"),
+				new File("C:\\Users\\morbini\\simcoach_svn\\trunk\\core\\NLModule\\resources\\characters\\Base-All\\nlu\\alignments.fst"),
 				defaultCmd);
 	}
 	public TraverseFST(File iSyms,File oSyms, File fst, String[] cmd) throws Exception {
