@@ -537,13 +537,13 @@ public class TrivialKBTest extends TestCase {
 		mykb.store(e,ACCESSTYPE.AUTO_OVERWRITEAUTO,false);
 		Object v=mykb.get("e");
 		assertTrue((v!=null) && (v instanceof DialogueKBFormula) && ((DialogueKBFormula) v).isString());
-		assertTrue(v.equals("'test'"));
+		assertTrue("'test'".equals(v));
 
 		e=DialogueOperatorEffect.parse("assign(e,'test')");
 		mykb.store(e,ACCESSTYPE.AUTO_OVERWRITEAUTO,false);
 		v=mykb.get("e");
 		assertTrue((v!=null) && (v instanceof DialogueKBFormula) && ((DialogueKBFormula) v).isString());
-		assertTrue(v.equals("'test'"));
+		assertTrue("'test'".equals(v));
 
 		e=DialogueOperatorEffect.parse("assign(f,'test')");
 		mykb.store(e,ACCESSTYPE.AUTO_OVERWRITEAUTO,false);
@@ -551,13 +551,13 @@ public class TrivialKBTest extends TestCase {
 		mykb.store(e,ACCESSTYPE.AUTO_OVERWRITEAUTO,false);
 		v=mykb.get("e");
 		assertTrue((v!=null) && (v instanceof DialogueKBFormula) && ((DialogueKBFormula) v).isString());
-		assertTrue(v.equals("'test'"));
+		assertTrue("'test'".equals(v));
 
 		e=DialogueOperatorEffect.parse("assign(e,'test')");
 		mykb.store(e,ACCESSTYPE.AUTO_OVERWRITEAUTO,false);
 		v=mykb.get("e");
 		assertTrue((v!=null) && (v instanceof DialogueKBFormula) && ((DialogueKBFormula) v).isString());
-		assertTrue(v.equals("'test'"));
+		assertTrue("'test'".equals(v));
 
 		e=DialogueOperatorEffect.parse("imply(e==2,e=3,e=4)");
 		mykb.store(e,ACCESSTYPE.AUTO_OVERWRITEAUTO,false);

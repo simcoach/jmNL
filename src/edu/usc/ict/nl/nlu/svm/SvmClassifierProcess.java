@@ -38,6 +38,9 @@ public class SvmClassifierProcess extends MXClassifierProcess {
 	@Override
 	public void run(String model, int nb) throws Exception {
 		nBest=nb;
+		if (classifier == null) {
+			throw new Exception("No classifier is set!");
+		}
 		if (model != null) classifier=new SVMModelAndDictionaries(nlu,new File(model));
 	}
 	

@@ -631,8 +631,11 @@ public class RewardDM extends DM {
 				Deque<NLUOutput> thisIsTheRealLast=null;
 				if (spokenFraction!=null && spokenFraction<.7) {
 					thisIsTheRealLast=userEventsHistoryContent.pop();
-					lastItem=userEventsHistoryContent.peekFirst();
-					if (lastItem==null) userEventsHistoryContent.push(lastItem=new LinkedList<NLUOutput>());
+					lastItem = userEventsHistoryContent.peekFirst();
+					if (lastItem == null) {
+						lastItem = new LinkedList<NLUOutput>();
+						userEventsHistoryContent.push(lastItem);
+					}
 				}
 				
 				NLUOutput sa=(NLUOutput) ev.getPayload();
@@ -1173,11 +1176,13 @@ public class RewardDM extends DM {
 							handlers.add(ec);
 						}
 					} else if (ec.isReEntrable()) {
-						DialogueAction da = dormantActions.getDormantActionOf(op);
-						EvalContext acontext = da.getContext();
-						if (ec.isExecutableInCurrentIS(null,acontext)) {
-							if (handlers==null) handlers=new ArrayList<DialogueOperatorEntranceTransition>();
-							handlers.add(ec);
+						if (dormantActions != null) {
+							DialogueAction da = dormantActions.getDormantActionOf(op);
+							EvalContext acontext = da.getContext();
+							if (ec.isExecutableInCurrentIS(null,acontext)) {
+								if (handlers==null) handlers=new ArrayList<DialogueOperatorEntranceTransition>();
+								handlers.add(ec);
+							}
 						}
 					}
 				}

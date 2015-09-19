@@ -170,6 +170,7 @@ public abstract class NLBusBase implements NLBusInterface {
 			Integer id = reply.hashCode();
 			Long timestamp = timestampsById.get(id);
 			if (timestamp == null) {
+				timestamp = currentTime;
 				timestampsById.put(id, currentTime);
 				return reply;
 			}

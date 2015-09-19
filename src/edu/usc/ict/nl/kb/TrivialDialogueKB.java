@@ -28,10 +28,12 @@ import edu.usc.ict.nl.utils.Sanitizer;
 public class TrivialDialogueKB extends DialogueKB {
 	
 	public class InternalKB {
-		Map<String,Object> variables;
+		
+		Map<String,Object> variables = new HashMap<String, Object>();
+		
 		public InternalKB() {
-			variables=new HashMap<String, Object>();
 		}
+		
 		public void put(DialogueKBFormula f,Object v) {
 			String name=f.getName();
 			name=normalizeNames(name);

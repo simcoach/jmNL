@@ -291,9 +291,8 @@ public abstract class DM implements DMInterface {
 					if (content==null) content=new LinkedHashMap<String, DialogueOperatorEffect>();
 					for(DialogueOperatorEffect e:c) {
 						DialogueKBFormula v=e.getAssignedVariable();
-						String vName=v.toString();
-						if (v!=null && !content.containsKey(vName)) {
-							content.put(vName, e);
+						if (v != null && !content.containsKey(v.toString())) {
+							content.put(v.toString(), e);
 						}
 					}
 				}
@@ -387,15 +386,12 @@ public abstract class DM implements DMInterface {
 		Object masterPreferForms=context.get(NLBusBase.preferFormsVariableName);
 		if (masterPreferForms!=null && (masterPreferForms.toString().equalsIgnoreCase("'yes'") || masterPreferForms.toString().equalsIgnoreCase("true"))) return true;
 		else {
-			Map parametersOfSpeechAct=(Map) ev.getPayload();
-			if (parametersOfSpeechAct!=null) {
+			Map parametersOfSpeechAct = (Map) ev.getPayload();
+			if (parametersOfSpeechAct != null) {
 				Object varPreferForms = parametersOfSpeechAct.get(NLBusBase.preferFormsVariableName);
-				if (varPreferForms != null) {
-					return varPreferForms.equals("yes"); 
-				} else {
-					return masterPreferForms.equals(true);
-				}
-			} else return false;
+				return ("yes".equals(varPreferForms) || Boolean.TRUE.equals(masterPreferForms));
+			}
+			return false;
 		}
 	}
 
